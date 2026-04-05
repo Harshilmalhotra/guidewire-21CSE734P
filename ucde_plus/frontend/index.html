@@ -71,7 +71,13 @@
             </div>
             
             <div id="state-success" class="ui-state hidden">
-                <div class="decision-badge" id="res-decision"></div>
+                <div class="decision-layout" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div class="decision-badge" id="res-baseline" style="flex:1; background: rgba(255,255,255,0.05); font-size: 0.9rem;">
+                        <span style="display:block; font-size:0.7rem; color:var(--text-muted);">BASELINE RULESET API</span>
+                        --
+                    </div>
+                    <div class="decision-badge" id="res-decision" style="flex:1;">--</div>
+                </div>
                 
                 <div class="metrics-grid">
                     <div class="metric-card">
@@ -105,8 +111,9 @@
                 </div>
 
                 <!-- Feedback Layer -->
-                <div id="feedback-panel" class="feedback-panel hidden" data-trace-id="">
+                <div id="feedback-panel" class="feedback-panel hidden" data-trace-id="" data-predicted-action="">
                     <h3>Adjuster Override Station</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Resolves decisions natively bounding Offline Batch Training configurations.</p>
                     <div class="feedback-actions">
                         <button class="btn-approve" onclick="submitAdjusterOverrides('AUTO_APPROVE', false)">Verify Authentic</button>
                         <button class="btn-danger" onclick="submitAdjusterOverrides('INVESTIGATE', true)">Flag as Fraud</button>

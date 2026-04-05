@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Set trace dynamically enabling UI features natively
             const fp = document.getElementById('feedback-panel');
             fp.dataset.traceId = result.trace_id;
+            fp.dataset.predictedAction = result.rl_decision;
             fp.classList.remove('hidden');
             
         } catch (err) {
@@ -70,7 +71,11 @@ async function submitAdjusterOverrides(action, isFraud) {
             throw new Error(errData.detail || 'Feedback Rejection Logic Bound');
         }
         
-        document.getElementById('feedback-panel').innerHTML = "<p style='color: var(--approve);'>Adjuster Ground Truth Integrated Continuously. Replay buffer aligned seamlessly!</p>";
+        const predicted = document.getElementById('feedback-panel').dataset.predictedAction;
+        const correctness = (predicted === action) ? "CORRECT" : "INCORRECT (Penalty Logged natively out towards SQLite buffers array metrics securely)";
+        const color = (predicted === action) ? "var(--approve)" : "var(--danger)";
+        
+        document.getElementById('feedback-panel').innerHTML = `<p style='color: ${color};'>Feedback Submitted! Model was ${correctness}.</p>`;
         
     } catch(err) {
         alert("Feedback Synchronization Failed: " + err.message);

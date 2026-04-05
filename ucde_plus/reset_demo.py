@@ -38,11 +38,25 @@ def reset_db():
     
     # Insert Demo Seeds representing past states
     for i in range(50):
+        t_id = f"seed-{i}"
+        pred_act = i % 2
+        # Pred inserting
         c.execute('''
             INSERT INTO predictions (trace_id, state_vector, predicted_action, model_version, timestamp, status)
             VALUES (?, ?, ?, ?, ?, ?)
-        ''', (f"seed-{i}", json.dumps([0,0,0,0,0,0]), i % 2, "v1.0.0", datetime.utcnow().isoformat(), "pending"))
-    
+        ''', (t_id, json.dumps([0.1, 0.05, 0, 0, 0, 0]), pred_act, "v1.0.0", datetime.utcnow().isoformat(), "finalized"))
+        
+        # Determine pseudo-random agreement mapping parity mathematically capturing logical alignment simulations natively
+        # Let's say 80% of the time, the adjuster agrees seamlessly natively
+        human_act = pred_act if (i % 5 != 0) else (1 - pred_act)
+        ver_fraud = True if human_act == 1 else False
+        calculated_reward = 1.0 if human_act == pred_act else -1.0 # simplified stub log mapping natively
+        
+        c.execute('''
+            INSERT INTO feedback (trace_id, human_action, verified_fraud, calculated_reward, adjuster_id, confidence, timestamp)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (t_id, human_act, ver_fraud, calculated_reward, "sys-doc-00", "HIGH", datetime.utcnow().isoformat()))
+        
     conn.commit()
     conn.close()
     print("Database reset and seeded with initial demo parameters natively.")

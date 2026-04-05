@@ -1,7 +1,10 @@
 function renderSuccess(data) {
     const decisionEl = document.getElementById('res-decision');
-    decisionEl.textContent = data.decision;
+    decisionEl.innerHTML = `<span style="display:block; font-size:0.7rem; color:var(--text-muted);">RL ACTION PIPELINE</span>${data.decision}`;
     decisionEl.style.color = data.decision === 'INVESTIGATE' ? 'var(--danger)' : 'var(--approve)';
+    
+    const baselineEl = document.getElementById('res-baseline');
+    baselineEl.innerHTML = `<span style="display:block; font-size:0.7rem; color:var(--text-muted);">BASELINE RULESET PREDICTION</span>${data.baseline_decision}`;
     
     document.getElementById('res-fraud').textContent = data.scores.fraud.toFixed(2);
     document.getElementById('res-severity').textContent = data.scores.severity.toFixed(2);

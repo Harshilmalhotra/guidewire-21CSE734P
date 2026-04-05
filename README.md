@@ -155,16 +155,14 @@ Resolves using:
 
 ---
 
-### 7. LLM Reasoning Layer (Controlled, Non-Naive Use)
+### 7. LLM Reasoning Layer (Deterministic Stub)
 
-Used ONLY for:
-
-* Decision explanation
-* Conflict reasoning
-* Human-readable justification
+Currently deployed as a **fallback stub** defining logical extraction outputs to circumvent OpenAI timeouts.
+Used for:
+* Template-based decision explanation
+* Conflict reasoning stubs
 
 NOT used for:
-
 * Core prediction
 * FNOL intake
 
@@ -186,11 +184,11 @@ Maximize:
 
 ---
 
-### 9. Continuous Learning Loop
+### 9. Continuous Learning Pipeline (Data Collection Layer)
 
-* Feedback → RL reward update
-* Adjuster override → policy refinement
-* Graph evolves over time
+* SQLite `training_store.db` replaces complex streaming event arrays securely offline.
+* Captures Adjuster Feedback deterministically tracking Baseline vs RL Parity loops explicitly.
+* Extracts arrays exclusively mapped towards Offline Batch Learning pipelines.
 
 ---
 
@@ -260,11 +258,11 @@ Maximize:
 
 ### Graph ML
 
-* Node2Vec / GraphSAGE
+* Heuristic-based connection simulations (NetworkX object references over Persistent DB boundaries)
 
 ### RL
 
-* Stable-Baselines3 (PPO / DQN)
+* Stable-Baselines3 (Offline Data Collection Placeholder)
 
 ### GenAI
 
@@ -272,9 +270,8 @@ Maximize:
 
 ### Infra
 
-* Kafka (event streaming)
-* Redis (feature store)
-* Docker
+* SQLite Database (Native Persistent Arrays)
+* Native FASTAPI Backends
 
 ---
 
@@ -313,19 +310,16 @@ Maximize:
 
 ## Components Breakdown (Updated)
 
-### 1. Graph Builder Service ⭐
+### 1. Graph Builder Service
 
-* Constructs claim graph
-* Links entities
+* Constructs heuristic claim graph bounds utilizing Node mapping lists over object logic natively.
 
 ---
 
-### 2. Graph Intelligence Engine ⭐
+### 2. Graph Intelligence Engine
 
 * Computes:
-
-  * centrality
-  * anomaly scores
+  * Simulated Anomaly limits based on Node tracking.
 
 ---
 
@@ -465,9 +459,17 @@ Includes:
 
 ## Phase 10 — Optimization & Demo
 
-* Logging
-* Metrics
-* UI polish
+* Structural JSON Rotating Logs
+* Cached SQLite Metric extractions
+* Feedback Safety Logic
+
+---
+
+## Phase 11 — Model Training & Deployment (TO BE IMPLEMENTED)
+
+* **The Real RL Upgrade Loop**: Offline script extracting `data/training_store.db`.
+* Executes `model.learn()` via Batch pipelines.
+* Formal Version switching (`v1.0.0` -> `v1.0.1`) smoothly integrated across `AgenticOrchestrator`.
 
 ---
 
