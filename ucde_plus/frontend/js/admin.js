@@ -34,9 +34,9 @@ async function fetchMetrics() {
 async function updateHealthHUD(data) {
     // LLM & Model Info
     document.getElementById('h-model').textContent = data.model_v || "v1";
-    document.getElementById('h-samples').textContent = data.total_feedback_events || 0;
+    document.getElementById('h-samples').textContent = data.total_samples_collected || 0;
     
-    const count = data.total_feedback_events || 0;
+    const count = data.total_samples_collected || 0;
     const btn = document.getElementById('btn-retrain');
     const read = document.getElementById('h-readiness');
     
