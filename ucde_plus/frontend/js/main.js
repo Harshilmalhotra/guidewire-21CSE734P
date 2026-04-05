@@ -75,9 +75,27 @@ async function submitAdjusterOverrides(action, isFraud) {
         const correctness = (predicted === action) ? "CORRECT" : "INCORRECT (Penalty Logged natively out towards SQLite buffers array metrics securely)";
         const color = (predicted === action) ? "var(--approve)" : "var(--danger)";
         
-        document.getElementById('feedback-panel').innerHTML = `<p style='color: ${color};'>Feedback Submitted! Model was ${correctness}.</p>`;
+        document.getElementById('feedback-panel').innerHTML = `<p style='color: ${color};'>Your Feedback: <strong>${action}</strong><br>System Model: <strong>${predicted}</strong><br>Feedback Submitted! Model was ${correctness}.</p>`;
         
     } catch(err) {
         alert("Feedback Synchronization Failed: " + err.message);
+    }
+}
+
+async function fetchReplayTrace() {
+    const traceId = document.getElementById('replay-trace-id').value;
+    if(!traceId) return;
+    
+    try {
+        const response = await fetch(`/v1/trace/${traceId}`, {
+            headers: { 'Authorization': 'Bearer admin-api-token' }
+        });
+        if(!response.ok) throw new Error("Trace ID isolated or missing within SQLite constraints");
+        
+        const data = await response.json();
+        alert(`Forensic Case Loaded:\n\nState Vector Bounds:\n[ ${data.state_vector.map(n=>n.toFixed(2)).join(", ")} ]\n\nPast RL Prediction: ${data.predicted_action}\nTimestamp: ${data.timestamp}\n\nReplay pipeline validates the vector limits securely offline.`);
+        
+    } catch(err) {
+        alert(err.message);
     }
 }

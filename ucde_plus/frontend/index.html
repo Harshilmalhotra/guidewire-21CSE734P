@@ -17,10 +17,18 @@
     <div class="grid-container">
         <!-- Input Layer -->
         <main class="panel form-panel glass">
-            <h1>UCDE++ Intake Gateway</h1>
+            <h2>UCDE++ Intake Gateway</h2>
             <p>Generate isolated synthetic variables initiating DAG pipeline configurations.</p>
             
-            <form id="claim-form">
+            <div id="case-replay-container" style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 6px; margin-bottom: 2rem;">
+                <h4 style="margin-top:0; color:var(--text-muted);">Forensic Case Replay</h4>
+                <div style="display:flex; gap:0.5rem;">
+                    <input type="text" id="replay-trace-id" placeholder="Trace ID (e.g. 648e3d99...)" style="flex:1;">
+                    <button id="btn-replay" onclick="fetchReplayTrace()" style="width: auto; padding: 0.5rem 1rem;">Load Memory</button>
+                </div>
+            </div>
+
+            <form id="fnol-form">
                 <div class="form-group">
                     <label for="policyId">Policy ID</label>
                     <input type="text" id="policyId" name="policyId" required>
@@ -79,22 +87,27 @@
                     <div class="decision-badge" id="res-decision" style="flex:1;">--</div>
                 </div>
                 
-                <div class="metrics-grid">
+                <div class="metrics-grid" style="grid-template-columns: 1fr;">
+                    <div class="metric-card" style="margin-bottom: 1rem;">
+                        <span class="label">Expected Reward Range</span>
+                        <span class="value" id="res-reward" style="font-size: 1.2rem; color:var(--text-muted);">--</span>
+                    </div>
+                </div>
+
+                <div class="metrics-grid" style="margin-top: 0;">
                     <div class="metric-card">
-                        <span class="label">Fraud Array</span>
-                        <span class="value" id="res-fraud">0.0</span>
+                        <span class="label">Fraud Score</span>
+                        <span class="value" id="res-fraud">0.00</span>
+                        <ul id="xai-fraud" style="margin-top:0.5rem; padding-left:1rem; font-size:0.75rem; color:var(--text-muted);"></ul>
                     </div>
                     <div class="metric-card">
-                        <span class="label">Severity Array</span>
-                        <span class="value" id="res-severity">0.0</span>
+                        <span class="label">Graph Risk</span>
+                        <span class="value" id="res-graph">0.00</span>
+                        <ul id="xai-graph" style="margin-top:0.5rem; padding-left:1rem; font-size:0.75rem; color:var(--text-muted);"></ul>
                     </div>
                     <div class="metric-card">
-                        <span class="label">Graph Bounds</span>
-                        <span class="value" id="res-graph">0.0</span>
-                    </div>
-                    <div class="metric-card">
-                        <span class="label">Expected Reward</span>
-                        <span class="value" id="res-reward">0.0</span>
+                        <span class="label">Severity</span>
+                        <span class="value" id="res-severity">0.00</span>
                     </div>
                 </div>
                 

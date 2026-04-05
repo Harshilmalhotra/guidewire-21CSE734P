@@ -9,7 +9,34 @@ function renderSuccess(data) {
     document.getElementById('res-fraud').textContent = data.scores.fraud.toFixed(2);
     document.getElementById('res-severity').textContent = data.scores.severity.toFixed(2);
     document.getElementById('res-graph').textContent = data.scores.graph.toFixed(2);
-    document.getElementById('res-reward').textContent = data.expected_reward.toFixed(2);
+    
+    // Reward formatting Semantic
+    const rew = data.expected_reward;
+    let rewText = rew.toFixed(2);
+    if(rew < -2.0) rewText += ' (High Risk Penalty)';
+    else if(rew > -1.0) rewText += ' (Clean Action Expectancy)';
+    document.getElementById('res-reward').textContent = rewText;
+    
+    // Explicit Feature Breakdowns
+    const fraudUl = document.getElementById('xai-fraud');
+    fraudUl.innerHTML = '';
+    if(data.scores.fraud_breakdown && Object.keys(data.scores.fraud_breakdown).length > 0) {
+        for(let key in data.scores.fraud_breakdown) {
+            fraudUl.innerHTML += `<li>${key}: +${data.scores.fraud_breakdown[key].toFixed(2)}</li>`;
+        }
+    } else {
+        fraudUl.innerHTML = `<li>Baseline Only</li>`;
+    }
+    
+    const graphUl = document.getElementById('xai-graph');
+    graphUl.innerHTML = '';
+    if(data.scores.graph_breakdown && Object.keys(data.scores.graph_breakdown).length > 0) {
+        for(let key in data.scores.graph_breakdown) {
+            graphUl.innerHTML += `<li>${key}: +${data.scores.graph_breakdown[key].toFixed(2)}</li>`;
+        }
+    } else {
+        graphUl.innerHTML = `<li>No Graph Links Detected</li>`;
+    }
     
     // LLM Layer
     document.getElementById('res-justification').textContent = data.explanation?.justification || "No generative evaluation computed securely.";
