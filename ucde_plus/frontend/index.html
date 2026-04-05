@@ -24,10 +24,14 @@
             <p>Generate isolated synthetic variables initiating DAG pipeline configurations.</p>
             
             <div id="case-replay-container" style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 6px; margin-bottom: 2rem;">
-                <h4 style="margin-top:0; color:var(--text-muted);">Forensic Case Replay</h4>
-                <div style="display:flex; gap:0.5rem;">
+                <h4 style="margin-top:0; color:var(--text-muted);">Forensic Case Replay & What-If Sandbox</h4>
+                <div style="display:flex; gap:0.5rem; margin-bottom: 1rem;">
                     <input type="text" id="replay-trace-id" placeholder="Trace ID (e.g. 648e3d99...)" style="flex:1;">
                     <button id="btn-replay" onclick="fetchReplayTrace()" style="width: auto; padding: 0.5rem 1rem;">Load Memory</button>
+                </div>
+                <div style="display:flex; gap:0.5rem;">
+                    <button onclick="loadWhatIfScenario('amount')" style="background: rgba(59, 130, 246, 0.2); border: 1px solid var(--primary); font-size: 0.8rem; padding: 0.5rem;">What-If: Severity Flip</button>
+                    <button onclick="loadWhatIfScenario('graph')" style="background: rgba(59, 130, 246, 0.2); border: 1px solid var(--primary); font-size: 0.8rem; padding: 0.5rem;">What-If: Contagion Trigger</button>
                 </div>
             </div>
 

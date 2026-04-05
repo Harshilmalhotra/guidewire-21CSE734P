@@ -99,3 +99,23 @@ async function fetchReplayTrace() {
         alert(err.message);
     }
 }
+
+function loadWhatIfScenario(type) {
+    if (type === 'amount') {
+        document.getElementById('policyId').value = "POL-W1";
+        document.getElementById('policyholderId').value = "JOHN-W1";
+        document.getElementById('vehicleVin').value = "VIN-W1";
+        document.getElementById('description').value = "Minor fender bender in parking lot.";
+        // Tweak amount high to trigger boundary flip natively
+        document.getElementById('claimAmount').value = "25000"; 
+        alert("What-If Scenario loaded: High Claim Amount (Severity Boundary Flip -> INVESTIGATE). Hit Evaluate to test.");
+    } else if (type === 'graph') {
+        document.getElementById('policyId').value = "POL-W2";
+        // Connect directly to known flagged node triggering deep graph anomaly logic
+        document.getElementById('policyholderId').value = "user-123"; 
+        document.getElementById('vehicleVin').value = "vin-456";
+        document.getElementById('description').value = "Clean record, parked car sideswiped.";
+        document.getElementById('claimAmount').value = "1000"; 
+        alert("What-If Scenario loaded: Explicit Graph Contagion Link (Network Boundary Flip -> INVESTIGATE). Hit Evaluate to test.");
+    }
+}
