@@ -32,25 +32,40 @@ class MetricsComputationLayer:
         
         total_feedback = len(feedbacks)
         agreements = 0
-        true_frauds = 0
-        captured_frauds = 0
+        
+        # ML Evaluation Matrix cleanly bound naturally over Action Space (1=Investigate[Fraud], 0=Approve[Clean])
+        # Mapping true_fraud as 1, predicted_fraud as 1
+        tp, fp, fn, tn = 0, 0, 0, 0
         
         for human_action, verified_fraud, predicted_action in feedbacks:
             if human_action == predicted_action:
                 agreements += 1
+                
+            # If ground truth was fraud (investigate)
             if verified_fraud:
-                true_frauds += 1
-                if predicted_action == 1: # 1 relies structurally mapped representing Investigation Action Constants
-                    captured_frauds += 1
+                if predicted_action == 1:
+                    tp += 1
+                else:
+                    fn += 1
+            else: # ground truth was clean
+                if predicted_action == 1:
+                    fp += 1
+                else:
+                    tn += 1
                     
         sys_agreement_rate = (agreements / total_feedback) if total_feedback > 0 else 0.0
-        fraud_capture_rate = (captured_frauds / true_frauds) if true_frauds > 0 else 0.0
+        
+        precision = (tp / (tp + fp)) if (tp + fp) > 0 else 0.0
+        recall = (tp / (tp + fn)) if (tp + fn) > 0 else 0.0
+        f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
         
         return {
             "total_claims_processed": total_claims,
             "total_feedback_events": total_feedback,
             "system_agreement_rate": round(sys_agreement_rate, 4),
-            "fraud_capture_rate": round(fraud_capture_rate, 4),
+            "precision": round(precision, 4),
+            "recall": round(recall, 4),
+            "f1_score": round(f1, 4),
             "window_days": days,
             "model_version": version
         }

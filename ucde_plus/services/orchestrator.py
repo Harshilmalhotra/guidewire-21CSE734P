@@ -147,7 +147,9 @@ class AgenticOrchestrator:
             scores={
                 "fraud": ctx.fraud_score if ctx.fraud_score is not None else 0.0,
                 "severity": ctx.severity_score if ctx.severity_score is not None else 0.0,
-                "graph": ctx.graph_risk_score if ctx.graph_risk_score is not None else 0.5
+                "graph": ctx.graph_risk_score if ctx.graph_risk_score is not None else 0.5,
+                "fraud_breakdown": ctx.fraud_breakdown,
+                "graph_breakdown": ctx.graph_breakdown
             },
             expected_reward=ctx.expected_reward,
             explanation=llm_output,

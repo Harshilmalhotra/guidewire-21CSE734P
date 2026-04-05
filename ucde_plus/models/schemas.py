@@ -29,6 +29,8 @@ class ScoresSchema(BaseModel):
     fraud: float
     severity: float
     graph: float
+    fraud_breakdown: Optional[dict] = None
+    graph_breakdown: Optional[dict] = None
 
 class FNOLResponse(BaseModel):
     trace_id: str

@@ -10,6 +10,8 @@ class ClaimContext(BaseModel):
     fraud_score: Optional[float] = None
     severity_score: Optional[float] = None
     graph_risk_score: Optional[float] = None
+    fraud_breakdown: Optional[Dict[str, float]] = None
+    graph_breakdown: Optional[Dict[str, float]] = None
     baseline_decision: Optional[str] = None
     rl_decision: Optional[str] = None
     expected_reward: Optional[float] = None

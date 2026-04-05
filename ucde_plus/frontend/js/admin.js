@@ -12,7 +12,11 @@ async function fetchMetrics() {
         
         document.getElementById('m_total_claims').textContent = data.total_claims_processed;
         document.getElementById('m_agreements').textContent = `${(data.system_agreement_rate * 100).toFixed(1)}%`;
-        document.getElementById('m_fraud_rate').textContent = `${(data.fraud_capture_rate * 100).toFixed(1)}%`;
+        
+        let p = (data.precision * 100).toFixed(1);
+        let r = (data.recall * 100).toFixed(1);
+        let f = (data.f1_score * 100).toFixed(1);
+        document.getElementById('m_fraud_rate').textContent = `P: ${p}% | R: ${r}% | F1: ${f}%`;
         
     } catch(err) {
         console.error("Admin KPI Block Disabled Securing internal structures: ", err);

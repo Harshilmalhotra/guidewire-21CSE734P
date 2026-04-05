@@ -6,6 +6,8 @@ from services.feedback_engine import global_feedback_engine
 from services.logger import system_logger
 from services.metrics import global_metrics_cache
 import time
+import sqlite3
+import json
 
 router = APIRouter(prefix="/v1")
 orchestrator = AgenticOrchestrator()
@@ -56,6 +58,27 @@ async def fetch_metrics(days: int = Query(7), model_version: str = Query("v1.0.0
         raise HTTPException(status_code=500, detail=stats["error"])
         
     return stats
+
+@router.get("/trace/{trace_id}")
+async def replay_trace(trace_id: str, authorization: str = Header(None)):
+    if authorization != "Bearer admin-api-token":
+        raise HTTPException(status_code=403, detail="Unauthorized")
+    
+    conn = sqlite3.connect("data/training_store.db")
+    c = conn.cursor()
+    c.execute("SELECT state_vector, predicted_action, timestamp FROM predictions WHERE trace_id=?", (trace_id,))
+    row = c.fetchone()
+    conn.close()
+    
+    if not row:
+        raise HTTPException(status_code=404, detail="Trace not found locally")
+        
+    return {
+        "trace_id": trace_id,
+        "state_vector": json.loads(row[0]),
+        "predicted_action": "INVESTIGATE" if row[1] == 1 else "AUTO_APPROVE",
+        "timestamp": row[2]
+    }
 
 @router.post("/feedback")
 async def submit_feedback(auth_payload: FeedbackRequest, authorization: str = Header(None)):

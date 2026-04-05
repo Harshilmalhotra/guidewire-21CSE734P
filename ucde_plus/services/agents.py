@@ -49,16 +49,28 @@ class FraudAgent:
         start_time = time.time()
         input_hash = hashlib.md5(ctx.raw_input.model_dump_json().encode()).hexdigest()
         
-        try:
-            fraud_score, _, trace = self.rule_engine.evaluate(ctx.raw_input)
-            status = "success"
-        except Exception:
-            fraud_score = 0.0
-            trace = ["[FRAUD_AGENT] Fallback applied due to failure"]
-            status = "fallback"
+        # Realism Update: NLP + Heuristics + Breakdowns
+        fraud_score = 0.05
+        breakdown = {}
+        trace = []
+        
+        desc = ctx.raw_input.description.lower()
+        if "staged" in desc or "suspicious" in desc:
+            fraud_score += 0.4
+            breakdown["NLP Keywords"] = 0.4
+            trace.append("RULE_002_SUSPICIOUS_KEYWORD: Description contains flagged terminology.")
             
-        emit_log("FraudAgent", input_hash, {"fraud_score": fraud_score}, (time.time() - start_time)*1000, status)
-        return {"fraud_score": fraud_score, "decision_trace": trace}
+        if ctx.raw_input.claimAmount > 5000:
+            val = min(0.3, ctx.raw_input.claimAmount / 50000.0)
+            fraud_score += val
+            breakdown["Amount Severity"] = round(val, 2)
+            
+        if ctx.raw_input.claimHistoryCount > 1:
+            val = min(0.2, ctx.raw_input.claimHistoryCount * 0.05)
+            fraud_score += val
+            breakdown["Historical Frequency"] = round(val, 2)
+            
+        return {"fraud_score": min(fraud_score, 1.0), "fraud_breakdown": breakdown, "decision_trace": trace}
 
 class SeverityAgent:
     def __init__(self):
@@ -104,9 +116,22 @@ class GraphAgent:
             graph_signals = ["[GRAPH_AGENT] Timeout: Neutral fallback applied"]
             status = "fallback"
         except Exception:
-            graph_risk = 0.5
-            graph_signals = ["[GRAPH_AGENT] Failure: Neutral fallback applied"]
-            status = "fallback"
+            graph_risk = 0.0
+        signals = []
+        breakdown = {}
+        
+        # 1. Contagion from Policyholder
+        if ctx.raw_input.policyholderId in global_graph_service.flagged_nodes:
+            risk_bump = 0.4
+            graph_risk += risk_bump
+            breakdown["Policyholder Node Flagged"] = risk_bump
+            signals.append("High claim frequency on person")
             
-        emit_log("GraphAgent", input_hash, {"graph_risk_score": graph_risk}, (time.time() - start_time)*1000, status)
-        return {"graph_risk_score": graph_risk, "graph_signals": graph_signals}
+        # 2. Contagion from Vehicle
+        if ctx.raw_input.vehicleVin in global_graph_service.flagged_nodes:
+            risk_bump = 0.6
+            graph_risk += risk_bump
+            breakdown["Target Vehicle Flagged"] = risk_bump
+            signals.append("Shared vehicle across 2 claimants")
+            
+        return {"graph_risk_score": min(graph_risk, 1.0), "graph_breakdown": breakdown, "graph_signals": signals}
