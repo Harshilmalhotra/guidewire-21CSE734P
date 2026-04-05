@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     transitionState(UIState.IDLE);
     
-    document.getElementById('claim-form').addEventListener('submit', async (e) => {
+    document.getElementById('fnol-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const claimAmount = parseFloat(document.getElementById('claimAmount').value);
