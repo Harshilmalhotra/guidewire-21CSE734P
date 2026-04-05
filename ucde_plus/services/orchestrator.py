@@ -4,6 +4,8 @@ from models.state import ClaimContext
 from services.agents import IntakeAgent, FraudAgent, SeverityAgent, GraphAgent
 from services.rl_engine import RLEngine
 from services.graph_builder import global_graph_service
+from services.llm_engine import LLMExplanationAgent
+from models.schemas import LLMInput
 
 class AggregationLayer:
     def extract_vector(self, ctx: ClaimContext) -> dict:
@@ -55,6 +57,10 @@ class DecisionAgent:
             decision_trace=trace
         )
 
+class ConflictDetector:
+    def evaluate(self, baseline: str, rl: str) -> bool:
+        return baseline != rl
+
 class AgenticOrchestrator:
     def __init__(self):
         self.intake = IntakeAgent()
@@ -63,6 +69,8 @@ class AgenticOrchestrator:
         self.graph = GraphAgent()
         self.aggregator = AggregationLayer()
         self.decision = DecisionAgent()
+        self.conflict = ConflictDetector()
+        self.llm = LLMExplanationAgent()
 
     async def process(self, request: FNOLRequest) -> FNOLResponse:
         # DAG Execute: Intake -> Gather(Fraud, Severity, Graph) -> Merge -> Aggregation -> Decision
@@ -94,7 +102,23 @@ class AgenticOrchestrator:
         # 5. Core Decision logic loop
         ctx = self.decision.execute(vector, ctx)
         
-        # Transform finalized immutable context explicitly back to standard generic FNOL API payload schema structure
+        # 6. Conflict Detector Boundary
+        has_conflict = self.conflict.evaluate(ctx.baseline_decision, ctx.rl_decision)
+        
+        # 7. LLM Explanation Layer (Read-Only)
+        llm_input = LLMInput(
+            baseline_decision=ctx.baseline_decision,
+            rl_decision=ctx.rl_decision,
+            fraud_score=ctx.fraud_score if ctx.fraud_score is not None else 0.0,
+            severity_score=ctx.severity_score if ctx.severity_score is not None else 0.0,
+            graph_risk_score=ctx.graph_risk_score if ctx.graph_risk_score is not None else 0.5,
+            expected_reward=ctx.expected_reward,
+            conflict_detected=has_conflict
+        )
+        
+        llm_output = await self.llm.execute(llm_input)
+        
+        # Formulate isolated generic response explicitly maintaining serialization boundaries
         return FNOLResponse(
             baselineDecision=ctx.baseline_decision,
             rlDecision=ctx.rl_decision,
@@ -103,5 +127,6 @@ class AgenticOrchestrator:
             graphRisk=ctx.graph_risk_score if ctx.graph_risk_score is not None else 0.5,
             fraudScore=ctx.fraud_score if ctx.fraud_score is not None else 0.0,
             decisionTrace=ctx.decision_trace,
-            graphSignals=ctx.graph_signals
+            graphSignals=ctx.graph_signals,
+            explanation=llm_output
         )

@@ -4,3 +4,4 @@ pydantic==2.6.3
 networkx==3.2.1
 stable-baselines3
 gymnasium
+openai

@@ -12,6 +12,19 @@ class FNOLRequest(BaseModel):
     timeSinceLastClaim: float = 0.0
     metadata: Optional[Dict[str, Any]] = None
 
+class LLMInput(BaseModel):
+    baseline_decision: str
+    rl_decision: str
+    fraud_score: float
+    severity_score: float
+    graph_risk_score: float
+    expected_reward: float
+    conflict_detected: bool
+
+class LLMOutput(BaseModel):
+    justification: str
+    conflict_explanation: Optional[str] = None
+
 class FNOLResponse(BaseModel):
     baselineDecision: str
     rlDecision: str
@@ -21,3 +34,4 @@ class FNOLResponse(BaseModel):
     fraudScore: float
     decisionTrace: List[str]
     graphSignals: List[str] = []
+    explanation: Optional[LLMOutput] = None
