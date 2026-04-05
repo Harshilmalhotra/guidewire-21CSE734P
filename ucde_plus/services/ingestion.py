@@ -2,17 +2,17 @@ from models.schemas import FNOLRequest, FNOLResponse
 from services.rule_engine import RuleEngine
 from services.graph_builder import global_graph_service
 from services.graph_intelligence import GraphIntelligenceEngine
+from services.rl_engine import RLEngine
 
 class IngestionPipeline:
     def __init__(self):
         self.rule_engine = RuleEngine()
         self.graph_engine = GraphIntelligenceEngine()
+        self.rl_engine = RLEngine()
 
     def process_claim(self, request: FNOLRequest) -> FNOLResponse:
-        # Phase 2: Rule-based Scoring Engine Evaluation
         fraud_score, severity_score, trace = self.rule_engine.evaluate(request)
         
-        # Phase 3: Graph Layer Evaluation
         global_graph_service.add_claim_entities(
             claim_id=request.policyId, 
             person_id=request.policyholderId, 
@@ -24,21 +24,18 @@ class IngestionPipeline:
             request.policyId
         )
         
-        # Determine decision based on thresholds
-        # Notice we are checking either fraud bounds OR graph_risk triggers natively
-        if fraud_score > 0.5 or severity_score > 0.8 or graph_risk > 0.4:
-            decision = "INVESTIGATE"
-            confidence = 0.85
-            
-            # Apply Risk Propagation Memory to nodes involved
+        # Phase 5: RL Decision Action
+        # Instead of static threshold checks, the RL Policy dictates the final outcome
+        decision = self.rl_engine.predict(severity_score, fraud_score, graph_risk, request.claimAmount)
+        confidence = 0.88 # Stabilized metric representation for RL Policy
+        
+        trace.append(f"RL_POLICY_DECISION: RL Model mathematically optimized policy output to {decision}")
+        
+        if decision == "INVESTIGATE":
             global_graph_service.mark_node_risk(request.policyId, True)
             if fraud_score > 0.5:
-                # Substantial fraud causes systemic entity penalization
                 if request.policyholderId: global_graph_service.mark_node_risk(request.policyholderId, True)
                 if request.vehicleVin: global_graph_service.mark_node_risk(request.vehicleVin, True)
-        else:
-            decision = "APPROVE"
-            confidence = 0.95
             
         if not trace:
             trace.append("RULE_000_CLEAN: No baseline rules violated.")
