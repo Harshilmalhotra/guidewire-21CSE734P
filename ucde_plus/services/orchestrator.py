@@ -138,6 +138,7 @@ class AgenticOrchestrator:
         delta = ""
         
         if ctx.rl_decision == "INVESTIGATE":
+            counter = f"To APPROVE: Severity < 0.50 AND Fraud < 0.60 AND Graph < 0.70"
             if f_score > 0.6:
                 primary_trigger = f"Fraud Score exceeded threshold ({f_score:.2f} > 0.60)"
                 if g_score >= 0.4: secondaries.append(f"Graph Risk elevated ({g_score:.2f})")
@@ -172,6 +173,7 @@ class AgenticOrchestrator:
                 primary_trigger = "RL Policy detected complex multi-factorial pattern anomaly natively compounding weights."
                 delta = "Compound matrix bound executed."
         else:
+            counter = f"To INVESTIGATE: Severity > 0.50 OR Fraud > 0.60 OR Graph > 0.70"
             primary_trigger = "All risk parameters evaluated cleanly bounded within Threshold limits."
             f_dist = 0.60 - f_score
             s_dist = 0.50 - s_score
@@ -199,6 +201,7 @@ class AgenticOrchestrator:
             secondary_contributors=secondaries,
             decision_stability=stability,
             sensitivity_delta=delta,
+            counterfactual=counter,
             influence_distribution=inf_dist
         )
         
@@ -240,6 +243,7 @@ class AgenticOrchestrator:
             secondary_contributors=ctx.secondary_contributors,
             decision_stability=ctx.decision_stability,
             sensitivity_delta=ctx.sensitivity_delta,
+            counterfactual=ctx.counterfactual,
             influence_distribution=ctx.influence_distribution,
             explanation=llm_output,
             decision_trace=ctx.decision_trace,

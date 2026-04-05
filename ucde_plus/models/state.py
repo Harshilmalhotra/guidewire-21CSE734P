@@ -21,6 +21,7 @@ class ClaimContext(BaseModel):
     secondary_contributors: List[str] = []
     decision_stability: Optional[str] = None
     sensitivity_delta: Optional[str] = None
+    counterfactual: Optional[str] = None
     influence_distribution: Dict[str, float] = {}
     decision_trace: List[str] = []
     graph_signals: List[str] = []

@@ -45,6 +45,7 @@ class FNOLResponse(BaseModel):
     secondary_contributors: list
     decision_stability: str
     sensitivity_delta: str
+    counterfactual: str
     influence_distribution: dict
     explanation: Optional[LLMOutput] = None
     

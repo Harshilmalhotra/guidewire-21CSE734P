@@ -71,6 +71,7 @@ function renderSuccess(data) {
     document.getElementById('res-justification').textContent = data.explanation?.justification || "No generative evaluation computed securely.";
     
     const conflictEl = document.getElementById('res-conflict');
+    document.getElementById('res-counter').textContent = data.counterfactual || "N/A";
     if(data.explanation?.conflict_explanation) {
         conflictEl.textContent = data.explanation.conflict_explanation;
         conflictEl.classList.remove('hidden');

@@ -20,7 +20,7 @@ async function fetchMetrics() {
         document.getElementById('m_drift_rate').textContent = `${(data.disagreement_drift_rate * 100).toFixed(1)}%`;
         
         let dist = data.trigger_distribution || {};
-        document.getElementById('m_trigger_dist').textContent = `Sev: ${dist.Severity || 0}% | Frd: ${dist.Fraud || 0}% | Grph: ${dist.Graph || 0}%`;
+        document.getElementById('m_trigger_dist').textContent = `Sev: ${dist.Severity || 0}% | Frd: ${dist.Fraud || 0}% | Grph: ${dist.Graph || 0}% (n=${data.total_claims_processed} cases)`;
         
     } catch(err) {
         console.error("Admin KPI Block Disabled Securing internal structures: ", err);

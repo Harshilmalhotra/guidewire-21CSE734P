@@ -24,7 +24,7 @@ async def submit_fnol(request: Request, payload: FNOLRequest, mode: str = Query(
     if client_ip in RATE_LIMIT_STORE:
         req_count, start_window = RATE_LIMIT_STORE[client_ip]
         if now - start_window < 60:
-            if req_count >= 10:
+            if req_count >= 1000:
                 raise HTTPException(status_code=429, detail="API rate limit exceeded. Please wait 60s")
             RATE_LIMIT_STORE[client_ip] = (req_count + 1, start_window)
         else:
