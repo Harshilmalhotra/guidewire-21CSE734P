@@ -88,7 +88,8 @@ class MetricsComputationLayer:
         
         return {
             "total_claims_processed": total_claims,
-            "total_feedback_events": total_feedback,
+            "total_feedback_events": len(feedbacks),
+            "total_samples_collected": total_feedback,
             "system_agreement_rate": round(sys_agreement_rate, 4),
             "disagreement_drift_rate": round(disagreement_rate, 4),
             "trigger_distribution": trigger_dist,
