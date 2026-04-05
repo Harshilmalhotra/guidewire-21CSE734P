@@ -3,6 +3,8 @@ from models.schemas import FNOLRequest, FNOLResponse, FeedbackRequest
 from services.orchestrator import AgenticOrchestrator
 from services.db_client import SQLiteClient
 from services.feedback_engine import global_feedback_engine
+from services.logger import system_logger
+from services.metrics import global_metrics_cache
 import time
 
 router = APIRouter(prefix="/v1")
@@ -33,9 +35,27 @@ async def submit_fnol(request: Request, payload: FNOLRequest, mode: str = Query(
     if mode != "debug":
         # Redaction by Design securely bounds the payload natively avoiding internal memory telemetry leakage
         response.decision_trace = None
-        response.graph_signals = None
         
+    # JSON Structural Log bounds natively mapping exact latency traces cleanly capturing response logic
+    latency_ms = (time.time() - now) * 1000
+    system_logger.info(
+        "Decision generated successfully natively caching limits explicitly",
+        extra={"layer": "api", "trace_id": response.trace_id, "latency_ms": latency_ms, "status": "success"}
+    )
+    
     return response
+
+@router.get("/metrics")
+async def fetch_metrics(days: int = Query(7), model_version: str = Query("v1.0.0"), authorization: str = Header(None)):
+    if authorization != "Bearer admin-api-token":
+        system_logger.error("Unauthorized GET bounds execution natively aborted.", extra={"layer": "api", "status": "403"})
+        raise HTTPException(status_code=403, detail="Unauthorized metrics view mapping.")
+        
+    stats = global_metrics_cache.get_aggregated_stats(days=days, version=model_version)
+    if "error" in stats:
+        raise HTTPException(status_code=500, detail=stats["error"])
+        
+    return stats
 
 @router.post("/feedback")
 async def submit_feedback(auth_payload: FeedbackRequest, authorization: str = Header(None)):

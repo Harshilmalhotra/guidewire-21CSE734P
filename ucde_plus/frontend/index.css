@@ -21,6 +21,14 @@ body {
     padding: 2rem;
 }
 
+.admin-hud {
+    display: flex; gap: 2rem; margin-bottom: 2rem; justify-content: center;
+    padding: 1rem; border-radius: 8px; background: rgba(0,0,0,0.4);
+    border: 1px solid var(--glass-border);
+}
+.hud-stat { font-weight: 600; font-size: 0.9rem; color: var(--text-muted); }
+.hud-stat span { color: var(--primary); font-size: 1.2rem; margin-left: 0.5rem; }
+
 .grid-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -31,6 +39,7 @@ body {
 
 @media (max-width: 768px) {
     .grid-container { grid-template-columns: 1fr; }
+    .admin-hud { flex-direction: column; align-items: center; gap: 0.5rem; }
 }
 
 .glass {
@@ -64,6 +73,12 @@ button {
     transition: background 0.2s;
 }
 button:hover { background: var(--primary-hover); }
+
+.feedback-actions { display: flex; gap: 1rem; margin-top: 1rem; }
+.btn-approve { background: var(--approve); }
+.btn-approve:hover { background: #059669; }
+.btn-danger { background: var(--danger); }
+.btn-danger:hover { background: #dc2626; }
 
 .hidden { display: none !important; }
 
@@ -103,6 +118,8 @@ button:hover { background: var(--primary-hover); }
 .conflict-banner {
     background: rgba(239, 68, 68, 0.2); border-left: 4px solid var(--danger); padding: 1rem; margin-top: 1rem; border-radius: 4px;
 }
+
+.feedback-panel { margin-top: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid var(--glass-border); text-align: center; }
 
 .debug-traces {
     margin-top: 2rem; font-family: monospace; font-size: 0.85rem; color: var(--text-muted);

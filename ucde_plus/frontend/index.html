@@ -8,6 +8,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <header class="admin-hud glass">
+        <div class="hud-stat">Total Claims: <span id="m_total_claims">--</span></div>
+        <div class="hud-stat">Agreement Rate: <span id="m_agreements">--</span></div>
+        <div class="hud-stat">Fraud Accuracy: <span id="m_fraud_rate">--</span></div>
+    </header>
+
     <div class="grid-container">
         <!-- Input Layer -->
         <main class="panel form-panel glass">
@@ -92,9 +98,19 @@
                     <div id="res-conflict" class="conflict-banner hidden"></div>
                 </div>
                 
+                
                 <div id="trace-container" class="debug-traces hidden">
                     <h3>DAG Internal Matrix Traces</h3>
                     <ul id="res-traces"></ul>
+                </div>
+
+                <!-- Feedback Layer -->
+                <div id="feedback-panel" class="feedback-panel hidden" data-trace-id="">
+                    <h3>Adjuster Override Station</h3>
+                    <div class="feedback-actions">
+                        <button class="btn-approve" onclick="submitAdjusterOverrides('AUTO_APPROVE', false)">Verify Authentic</button>
+                        <button class="btn-danger" onclick="submitAdjusterOverrides('INVESTIGATE', true)">Flag as Fraud</button>
+                    </div>
                 </div>
             </div>
         </aside>
@@ -105,5 +121,6 @@
     <script src="js/api.js"></script>
     <script src="js/render.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/admin.js"></script>
 </body>
 </html>
