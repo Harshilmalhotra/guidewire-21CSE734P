@@ -42,7 +42,11 @@ class MetricsComputationLayer:
             for k in trigger_dist:
                 trigger_dist[k] = round((trigger_dist[k] / total_trig) * 100, 1)
         
-        # Feedback counts mapped
+        # Explicit count of Ground Truth feedback events for 10/10 Enterprise training logic
+        c.execute("SELECT COUNT(*) FROM feedback")
+        total_feedback = c.fetchone()[0]
+        
+        # Feedback accuracy map
         c.execute('''
             SELECT f.human_action, f.verified_fraud, p.predicted_action 
             FROM feedback f

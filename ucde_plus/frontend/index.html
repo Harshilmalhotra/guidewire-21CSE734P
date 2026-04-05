@@ -162,7 +162,48 @@
                         <button class="btn-danger" onclick="submitAdjusterOverrides('INVESTIGATE', true)">Flag as Fraud</button>
                     </div>
                 </div>
-            </div>
+            </section>
+
+            <!-- 10/10 Enterprise MLOps Training Dashboard -->
+            <section class="card" style="margin-top: 1rem; border-top: 4px solid var(--primary);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h2 style="margin:0;">System Training & Health</h2>
+                    <span id="h-status-tag" class="hud-stat" style="background:var(--success); color:white; padding: 2px 8px; border-radius:4px; font-size:0.7rem;">HEALTHY</span>
+                </div>
+                
+                <div class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:0.5rem;">
+                    <div class="metric-card" style="background:rgba(255,255,255,0.05);">
+                         <span class="label">LLM Mode</span>
+                         <span class="value" id="h-llm" style="font-size:0.9rem; color:var(--info);">--</span>
+                    </div>
+                    <div class="metric-card" style="background:rgba(255,255,255,0.05);">
+                         <span class="label">Active Model</span>
+                         <span class="value" id="h-model" style="font-size:0.9rem;">--</span>
+                    </div>
+                    <div class="metric-card" style="background:rgba(255,255,255,0.05);">
+                         <span class="label">Samples (n)</span>
+                         <span class="value" id="h-samples" style="font-size:0.9rem;">--</span>
+                    </div>
+                    <div class="metric-card" style="background:rgba(255,255,255,0.05);">
+                         <span class="label">Training Readiness</span>
+                         <span class="value" id="h-readiness" style="font-size:0.9rem; color:var(--text-muted);">--</span>
+                    </div>
+                </div>
+
+                <div id="training-progress-container" class="hidden" style="margin-top:1rem; background:rgba(255,255,255,0.05); padding:1rem; border-radius:8px;">
+                     <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                         <span style="font-size:0.8rem; font-weight:bold;">Retraining in Progress...</span>
+                         <span id="h-training-status" style="font-size:0.8rem; font-weight:bold; color:var(--info);">RUNNING</span>
+                     </div>
+                     <div style="height:4px; width:100%; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden;">
+                         <div id="h-progress-bar" style="height:100%; width:30%; background:var(--info); transition: width 0.3s ease;"></div>
+                     </div>
+                </div>
+
+                <button id="btn-retrain" class="primary-btn" style="width:100%; margin-top:1rem; opacity:0.5; cursor:not-allowed;" disabled>
+                    Retrain RL Policy Natively
+                </button>
+            </section>
         </aside>
     </div>
 

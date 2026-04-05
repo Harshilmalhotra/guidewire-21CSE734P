@@ -2,13 +2,15 @@ from stable_baselines3 import PPO
 import numpy as np
 import os
 
+from services.model_registry import global_model_registry
+
 class RLEngine:
     def __init__(self):
-        self.model_path = "ppo_claim_policy"
-        if os.path.exists(self.model_path + ".zip"):
+        self.model_path = global_model_registry.get_active_model_path()
+        if os.path.exists(self.model_path) or os.path.exists(self.model_path + ".zip"):
             self.model = PPO.load(self.model_path)
         else:
-            raise Exception("RL model missing! You must pre-train by running: python train_rl.py")
+            raise Exception(f"RL model missing at {self.model_path}! Run: python train_rl.py")
             
     def predict(self, severity_score: float, fraud_score: float, graph_risk: float, claim_amount: float, history_count: int, time_since: float):
         norm_amt = min(1.0, (claim_amount or 0.0) / 20000.0)

@@ -4,7 +4,8 @@ from models.state import ClaimContext
 from services.agents import IntakeAgent, FraudAgent, SeverityAgent, GraphAgent
 from services.rl_engine import RLEngine
 from services.graph_builder import global_graph_service
-from services.llm_engine import LLMExplanationAgent
+from services.llm_manager import global_llm_manager
+from services.model_registry import global_model_registry
 from services.db_client import SQLiteClient
 from models.schemas import LLMInput
 
@@ -71,7 +72,7 @@ class AgenticOrchestrator:
         self.aggregator = AggregationLayer()
         self.decision = DecisionAgent()
         self.conflict = ConflictDetector()
-        self.llm = LLMExplanationAgent()
+        self.llm = global_llm_manager
         self.db = SQLiteClient()
 
     async def process(self, request: FNOLRequest) -> FNOLResponse:
