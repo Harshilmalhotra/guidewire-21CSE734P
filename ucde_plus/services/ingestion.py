@@ -1,6 +1,6 @@
 from models.schemas import FNOLRequest, FNOLResponse
 from services.rule_engine import RuleEngine
-from services.graph_builder import global_claim_graph
+from services.graph_builder import global_graph_service
 from services.graph_intelligence import GraphIntelligenceEngine
 
 class IngestionPipeline:
@@ -13,22 +13,29 @@ class IngestionPipeline:
         fraud_score, severity_score, trace = self.rule_engine.evaluate(request)
         
         # Phase 3: Graph Layer Evaluation
-        global_claim_graph.add_claim_entities(
+        global_graph_service.add_claim_entities(
             claim_id=request.policyId, 
-            policyholder_id=request.policyholderId, 
+            person_id=request.policyholderId, 
             vehicle_vin=request.vehicleVin
         )
         
-        graph_risk, graph_trace = self.graph_engine.evaluate_risk(
-            global_claim_graph.get_graph(), 
+        graph_risk, graph_signals = self.graph_engine.evaluate_risk(
+            global_graph_service.get_graph(), 
             request.policyId
         )
-        trace.extend(graph_trace)
         
         # Determine decision based on thresholds
-        if fraud_score > 0.5 or severity_score > 0.8 or graph_risk > 0.2:
+        # Notice we are checking either fraud bounds OR graph_risk triggers natively
+        if fraud_score > 0.5 or severity_score > 0.8 or graph_risk > 0.4:
             decision = "INVESTIGATE"
             confidence = 0.85
+            
+            # Apply Risk Propagation Memory to nodes involved
+            global_graph_service.mark_node_risk(request.policyId, True)
+            if fraud_score > 0.5:
+                # Substantial fraud causes systemic entity penalization
+                if request.policyholderId: global_graph_service.mark_node_risk(request.policyholderId, True)
+                if request.vehicleVin: global_graph_service.mark_node_risk(request.vehicleVin, True)
         else:
             decision = "APPROVE"
             confidence = 0.95
@@ -41,5 +48,6 @@ class IngestionPipeline:
             confidence=confidence,
             graphRisk=graph_risk,
             fraudScore=fraud_score,
-            decisionTrace=trace
+            decisionTrace=trace,
+            graphSignals=graph_signals
         )

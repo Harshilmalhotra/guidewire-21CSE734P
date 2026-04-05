@@ -16,3 +16,4 @@ class FNOLResponse(BaseModel):
     graphRisk: float
     fraudScore: float
     decisionTrace: List[str]
+    graphSignals: List[str] = []
