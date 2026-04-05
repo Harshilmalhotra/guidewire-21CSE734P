@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCDE++ V1 Telemetry</title>
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="grid-container">
+        <!-- Input Layer -->
+        <main class="panel form-panel glass">
+            <h1>UCDE++ Intake Gateway</h1>
+            <p>Generate isolated synthetic variables initiating DAG pipeline configurations.</p>
+            
+            <form id="claim-form">
+                <div class="form-group">
+                    <label for="policyId">Policy ID</label>
+                    <input type="text" id="policyId" name="policyId" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="policyholderId">Policyholder ID</label>
+                    <input type="text" id="policyholderId" name="policyholderId" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="vehicleVin">Vehicle VIN</label>
+                    <input type="text" id="vehicleVin" name="vehicleVin" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="claimAmount">Claim Amount ($)</label>
+                    <input type="number" id="claimAmount" name="claimAmount" min="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Incident Description</label>
+                    <textarea id="description" name="description" rows="3" required></textarea>
+                </div>
+
+                <div class="form-group mode-toggle">
+                    <label>
+                        <input type="checkbox" id="debugMode" name="debugMode">
+                        Enable Debug Trace
+                    </label>
+                </div>
+                
+                <button type="submit" id="submit-btn" aria-label="Submit Claim for Evaluation">Evaluate Architecture</button>
+                <div id="error-message" class="error-msg hidden" role="alert"></div>
+            </form>
+        </main>
+        
+        <!-- Render Layer -->
+        <aside class="panel result-panel glass" aria-live="polite">
+            <h2>Verdict Telemetry</h2>
+            
+            <div id="state-idle" class="ui-state">Awaiting asynchronous transmission loops...</div>
+            
+            <div id="state-loading" class="ui-state hidden">
+                <div class="skeleton-shimmer">Analyzing Context Bounds...</div>
+                <div class="skeleton-block"></div>
+                <div class="skeleton-block delay"></div>
+            </div>
+            
+            <div id="state-success" class="ui-state hidden">
+                <div class="decision-badge" id="res-decision"></div>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="label">Fraud Array</span>
+                        <span class="value" id="res-fraud">0.0</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="label">Severity Array</span>
+                        <span class="value" id="res-severity">0.0</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="label">Graph Bounds</span>
+                        <span class="value" id="res-graph">0.0</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="label">Expected Reward</span>
+                        <span class="value" id="res-reward">0.0</span>
+                    </div>
+                </div>
+                
+                <div class="llm-explanation">
+                    <h3>Semantic Execution</h3>
+                    <p id="res-justification"></p>
+                    <div id="res-conflict" class="conflict-banner hidden"></div>
+                </div>
+                
+                <div id="trace-container" class="debug-traces hidden">
+                    <h3>DAG Internal Matrix Traces</h3>
+                    <ul id="res-traces"></ul>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Modularity Mapping -->
+    <script src="js/state.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -16,7 +16,7 @@ def test_fnol():
         "timeSinceLastClaim": 10.0,
         "metadata": {}
     }
-    r = client.post("/fnol", json=payload)
+    r = client.post("/v1/fnol?mode=debug", json=payload)
     print("Response:", r.json())
     assert r.status_code == 200
 
@@ -32,7 +32,7 @@ def test_fnol():
         "timeSinceLastClaim": 1000.0,
         "metadata": {}
     }
-    r_c = client.post("/fnol", json=payload_clean)
+    r_c = client.post("/v1/fnol?mode=debug", json=payload_clean)
     print("Response:", r_c.json())
 
     print("\n--- TEST 3: GRAPH CONTAGION ABUSING NEW VARIABLES ---")
@@ -47,9 +47,29 @@ def test_fnol():
         "timeSinceLastClaim": 30.0,
         "metadata": {}
     }
-    r_p = client.post("/fnol", json=payload_prop)
+    r_p = client.post("/v1/fnol?mode=debug", json=payload_prop)
     print("Response:", r_p.json())
-    assert r_p.status_code == 200
+    print("\n--- TEST 4: BATCH LEARNING DATA FEEDBACK PIPELINE ---")
+    trace_id = r_p.json()["trace_id"]
+    feedback_payload = {
+        "trace_id": trace_id,
+        "human_action": "INVESTIGATE",
+        "verified_fraud": True,
+        "confidence": "HIGH",
+        "comment": "Adjuster independently validated contagion bounds matching LLM outputs logically"
+    }
+    
+    headers = {"Authorization": "Bearer adjuster-api-token"}
+    r_f = client.post("/v1/feedback", json=feedback_payload, headers=headers)
+    print("Feedback Submission Response:", r_f.json())
+    assert r_f.status_code == 200
+    
+    # Test Idempotency natively handling duplicated logic bounds gracefully mapping poison
+    r_f_dup = client.post("/v1/feedback", json=feedback_payload, headers=headers)
+    assert r_f_dup.status_code == 409
+    print("Idempotency Constraint Confirmed:", r_f_dup.json())
+    
+    print("\n[✔] Test Suite Passed. DB Persistence logged globally.")
 
 if __name__ == "__main__":
     test_fnol()

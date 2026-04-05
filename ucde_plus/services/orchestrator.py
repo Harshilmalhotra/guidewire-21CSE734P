@@ -5,6 +5,7 @@ from services.agents import IntakeAgent, FraudAgent, SeverityAgent, GraphAgent
 from services.rl_engine import RLEngine
 from services.graph_builder import global_graph_service
 from services.llm_engine import LLMExplanationAgent
+from services.db_client import SQLiteClient
 from models.schemas import LLMInput
 
 class AggregationLayer:
@@ -71,6 +72,7 @@ class AgenticOrchestrator:
         self.decision = DecisionAgent()
         self.conflict = ConflictDetector()
         self.llm = LLMExplanationAgent()
+        self.db = SQLiteClient()
 
     async def process(self, request: FNOLRequest) -> FNOLResponse:
         # DAG Execute: Intake -> Gather(Fraud, Severity, Graph) -> Merge -> Aggregation -> Decision
@@ -118,15 +120,37 @@ class AgenticOrchestrator:
         
         llm_output = await self.llm.execute(llm_input)
         
+        
+        # 8. Persistent offline array mapped for Database constraints capturing exactly the math required explicitly
+        _serialized_state = [
+            vector["severity_score"],
+            vector["fraud_score"],
+            vector["graph_risk"],
+            vector["claim_amount"],
+            vector["history_count"],
+            vector["time_since"]
+        ]
+        
+        self.db.insert_prediction(
+            trace_id=ctx.trace_id,
+            state_vector=_serialized_state,
+            action_str=ctx.rl_decision,
+            version="v1.0.0"
+        )
+        
         # Formulate isolated generic response explicitly maintaining serialization boundaries
         return FNOLResponse(
-            baselineDecision=ctx.baseline_decision,
-            rlDecision=ctx.rl_decision,
-            expectedReward=ctx.expected_reward,
-            confidence=0.88,
-            graphRisk=ctx.graph_risk_score if ctx.graph_risk_score is not None else 0.5,
-            fraudScore=ctx.fraud_score if ctx.fraud_score is not None else 0.0,
-            decisionTrace=ctx.decision_trace,
-            graphSignals=ctx.graph_signals,
-            explanation=llm_output
+            trace_id=ctx.trace_id,
+            decision=ctx.rl_decision,
+            baseline_decision=ctx.baseline_decision,
+            rl_decision=ctx.rl_decision,
+            scores={
+                "fraud": ctx.fraud_score if ctx.fraud_score is not None else 0.0,
+                "severity": ctx.severity_score if ctx.severity_score is not None else 0.0,
+                "graph": ctx.graph_risk_score if ctx.graph_risk_score is not None else 0.5
+            },
+            expected_reward=ctx.expected_reward,
+            explanation=llm_output,
+            decision_trace=ctx.decision_trace,
+            graph_signals=ctx.graph_signals
         )

@@ -1,10 +1,24 @@
+import os
 from fastapi import FastAPI
-from api.routes import router as fnol_router
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from api.routes import router
 
-app = FastAPI(title="UCDE++", description="Unified Claims Decision Engine", version="1.0.0")
+app = FastAPI(title="UCDE++ Decision Platform v1")
 
-app.include_router(fnol_router)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://127.0.0.1:8000", "http://localhost:8000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.get("/")
+app.include_router(router)
+
+frontend_path = os.path.join(os.path.dirname(__file__), "frontend")
+app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+
+@app.get("/health")
 def health_check():
     return {"status": "ok", "message": "UCDE++ Phase 1 Base System is running"}
