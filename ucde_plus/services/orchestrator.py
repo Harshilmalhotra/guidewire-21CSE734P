@@ -124,18 +124,63 @@ class AgenticOrchestrator:
         s_score = ctx.severity_score or 0.0
         g_score = ctx.graph_risk_score or 0.0
         
+        # Influence Matrix
+        total_risk = f_score + s_score + g_score
+        inf_dist = {}
+        if total_risk > 0:
+            inf_dist["Severity"] = round((s_score / total_risk) * 100, 1)
+            inf_dist["Fraud"] = round((f_score / total_risk) * 100, 1)
+            inf_dist["Graph"] = round((g_score / total_risk) * 100, 1)
+            
         primary_trigger = ""
+        secondaries = []
+        stability = "HIGH"
+        delta = ""
+        
         if ctx.rl_decision == "INVESTIGATE":
             if f_score > 0.6:
                 primary_trigger = f"Fraud Score exceeded threshold ({f_score:.2f} > 0.60)"
+                if g_score >= 0.4: secondaries.append(f"Graph Risk elevated ({g_score:.2f})")
+                if s_score >= 0.4: secondaries.append(f"Severity approaching bound ({s_score:.2f})")
+                dist = f_score - 0.60
+                if dist < 0.05:
+                    stability = "LOW"
+                    delta = f"Δ -{(dist+0.01):.2f} flips decision boundary exactly."
+                else: 
+                    delta = f"Δ -{(dist+0.01):.2f} flips decision boundary exactly."
             elif g_score > 0.7:
                 primary_trigger = f"Graph Risk exceeded threshold ({g_score:.2f} > 0.70)"
+                if f_score >= 0.4: secondaries.append(f"Fraud Score elevated ({f_score:.2f})")
+                if s_score >= 0.4: secondaries.append(f"Severity approaching bound ({s_score:.2f})")
+                dist = g_score - 0.70
+                if dist < 0.05:
+                    stability = "LOW"
+                    delta = f"Δ -{(dist+0.01):.2f} flips decision boundary exactly."
+                else: 
+                    delta = f"Δ -{(dist+0.01):.2f} flips decision boundary exactly."
             elif s_score > 0.5:
                 primary_trigger = f"Severity Analysis exceeded threshold ({s_score:.2f} > 0.50)"
+                if f_score >= 0.4: secondaries.append(f"Fraud Score elevated ({f_score:.2f})")
+                if g_score >= 0.4: secondaries.append(f"Graph Risk elevated ({g_score:.2f})")
+                dist = s_score - 0.50
+                if dist < 0.05:
+                    stability = "LOW"
+                    delta = f"Δ -{(dist+0.01):.2f} flips decision boundary exactly."
+                else: 
+                    delta = f"Δ -{(dist+0.01):.2f} flips decision boundary exactly."
             else:
-                primary_trigger = "RL Policy detected complex multi-factorial pattern anomaly."
+                primary_trigger = "RL Policy detected complex multi-factorial pattern anomaly natively compounding weights."
+                delta = "Compound matrix bound executed."
         else:
             primary_trigger = "All risk parameters evaluated cleanly bounded within Threshold limits."
+            f_dist = 0.60 - f_score
+            s_dist = 0.50 - s_score
+            min_dist = min(f_dist, s_dist)
+            if min_dist < 0.10:
+                stability = "LOW"
+                delta = f"Δ +{(min_dist+0.01):.2f} flips decision boundary exactly."
+            else:
+                delta = f"Δ +{(min_dist+0.01):.2f} flips decision boundary exactly."
         
         mean_sig = (f_score + s_score + g_score) / 3.0
         variance = ((f_score - mean_sig)**2 + (s_score - mean_sig)**2 + (g_score - mean_sig)**2) / 3.0
@@ -147,7 +192,15 @@ class AgenticOrchestrator:
         if confidence_val < 0.75:
             c_reason = "Derived from internal distance boundary variances (Nodes contradicted natively)."
             
-        ctx = ctx.update(confidence_score=confidence_val, confidence_reason=c_reason, primary_trigger=primary_trigger)
+        ctx = ctx.update(
+            confidence_score=confidence_val, 
+            confidence_reason=c_reason, 
+            primary_trigger=primary_trigger,
+            secondary_contributors=secondaries,
+            decision_stability=stability,
+            sensitivity_delta=delta,
+            influence_distribution=inf_dist
+        )
         
         # 8. Persistent offline array mapped for Database constraints capturing exactly the math required explicitly
         _serialized_state = [
@@ -184,6 +237,10 @@ class AgenticOrchestrator:
             confidence_score=ctx.confidence_score,
             confidence_reason=ctx.confidence_reason,
             primary_trigger=ctx.primary_trigger,
+            secondary_contributors=ctx.secondary_contributors,
+            decision_stability=ctx.decision_stability,
+            sensitivity_delta=ctx.sensitivity_delta,
+            influence_distribution=ctx.influence_distribution,
             explanation=llm_output,
             decision_trace=ctx.decision_trace,
             graph_signals=ctx.graph_signals

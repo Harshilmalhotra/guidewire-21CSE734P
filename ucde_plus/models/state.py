@@ -18,6 +18,10 @@ class ClaimContext(BaseModel):
     confidence_score: Optional[float] = None
     confidence_reason: Optional[str] = None
     primary_trigger: Optional[str] = None
+    secondary_contributors: List[str] = []
+    decision_stability: Optional[str] = None
+    sensitivity_delta: Optional[str] = None
+    influence_distribution: Dict[str, float] = {}
     decision_trace: List[str] = []
     graph_signals: List[str] = []
 

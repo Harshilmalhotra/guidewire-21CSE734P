@@ -16,11 +16,31 @@ class MetricsComputationLayer:
         boundary = self._get_time_boundary(days)
         
         # Total Claims and Baseline Disagreement Tracking
-        c.execute("SELECT predicted_action, baseline_action FROM predictions WHERE timestamp >= ? AND model_version = ?", (boundary, version))
+        c.execute("SELECT predicted_action, baseline_action, state_vector FROM predictions WHERE timestamp >= ? AND model_version = ?", (boundary, version))
         prediction_rows = c.fetchall()
         total_claims = len(prediction_rows)
         drift_count = sum([1 for r in prediction_rows if r[0] != r[1]])
         disagreement_rate = (drift_count / total_claims) if total_claims > 0 else 0.0
+        
+        # Macro Trigger Distribution securely tracking system behaviors
+        import json
+        trigger_dist = {"Severity": 0, "Fraud": 0, "Graph": 0}
+        for r in prediction_rows:
+            if r[0] == "INVESTIGATE":
+                try:
+                    s_vec = json.loads(r[2])
+                    sev = s_vec[0]
+                    frd = s_vec[1]
+                    grph = s_vec[2]
+                    if frd > 0.6: trigger_dist["Fraud"] += 1
+                    elif grph > 0.7: trigger_dist["Graph"] += 1
+                    elif sev > 0.5: trigger_dist["Severity"] += 1
+                except:
+                    pass
+        total_trig = sum(trigger_dist.values())
+        if total_trig > 0:
+            for k in trigger_dist:
+                trigger_dist[k] = round((trigger_dist[k] / total_trig) * 100, 1)
         
         # Feedback counts mapped
         c.execute('''
@@ -67,6 +87,7 @@ class MetricsComputationLayer:
             "total_feedback_events": total_feedback,
             "system_agreement_rate": round(sys_agreement_rate, 4),
             "disagreement_drift_rate": round(disagreement_rate, 4),
+            "trigger_distribution": trigger_dist,
             "precision": round(precision, 4),
             "recall": round(recall, 4),
             "f1_score": round(f1, 4),

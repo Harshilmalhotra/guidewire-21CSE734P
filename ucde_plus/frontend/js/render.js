@@ -40,8 +40,32 @@ function renderSuccess(data) {
         graphUl.innerHTML = `<li>No Graph Links Detected -> Baseline Set</li>`;
     }
     
+    // Stability Layer Map
+    const stabMetric = document.getElementById('res-stability');
+    stabMetric.textContent = data.decision_stability;
+    stabMetric.style.color = (data.decision_stability === "LOW") ? "var(--warning)" : "var(--approve)";
+    document.getElementById('res-delta').textContent = data.sensitivity_delta;
+    
+    // Composition Map
+    const inf = data.influence_distribution;
+    if (inf && Object.keys(inf).length > 0) {
+        document.getElementById('res-composition').textContent = `Severity: ${inf.Severity}% influence | Fraud: ${inf.Fraud}% | Graph: ${inf.Graph}%`;
+    } else {
+        document.getElementById('res-composition').textContent = `Not calculated safely.`;
+    }
+    
     // Explanation Layer explicitly routing Triggers
     document.getElementById('res-trigger').textContent = data.primary_trigger || "Execution securely terminated natively.";
+    
+    const secList = document.getElementById('res-secondaries');
+    secList.innerHTML = '';
+    if (data.secondary_contributors && data.secondary_contributors.length > 0) {
+        data.secondary_contributors.forEach(s => {
+            secList.innerHTML += `<li>${s}</li>`;
+        });
+    } else {
+        secList.innerHTML = `<li>No secondary signals passed threshold boundaries securely.</li>`;
+    }
     
     // LLM Layer
     document.getElementById('res-justification').textContent = data.explanation?.justification || "No generative evaluation computed securely.";

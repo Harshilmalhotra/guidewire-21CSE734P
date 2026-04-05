@@ -42,7 +42,11 @@ class FNOLResponse(BaseModel):
     confidence_score: float
     confidence_reason: str
     primary_trigger: str
-    explanation: Optional[dict] = None
+    secondary_contributors: list
+    decision_stability: str
+    sensitivity_delta: str
+    influence_distribution: dict
+    explanation: Optional[LLMOutput] = None
     
     # Redaction parameters securely enforcing serialization
     decision_trace: Optional[List[str]] = None

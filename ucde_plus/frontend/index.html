@@ -13,7 +13,8 @@
             <div class="hud-stat">Total Claims: <span id="m_total_claims">--</span></div>
             <div class="hud-stat">Agreement Rate: <span id="m_agreements">--</span></div>
             <div class="hud-stat">Fraud Accuracy: <span id="m_fraud_rate">--</span></div>
-            <div class="hud-stat" style="color:var(--danger);">Disagreement Drift: <span id="m_drift_rate" style="color:var(--danger)">--</span></div>
+            <div class="hud-stat" style="color:var(--danger);">⚠ Drift Alert: RL overrides ↑ <span id="m_drift_rate" style="color:var(--danger)">--</span></div>
+            <div class="hud-stat" style="color:var(--primary);">Trigger Dist: <span id="m_trigger_dist">--</span></div>
         </div>
     </header>
 
@@ -95,9 +96,16 @@
                 </div>
                 
                 <div class="metrics-grid" style="grid-template-columns: 1fr;">
-                    <div class="metric-card" style="margin-bottom: 1rem;">
+                    <div class="metric-card" style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
                         <span class="label">Expected Reward Range</span>
                         <span class="value" id="res-reward" style="font-size: 1.2rem; color:var(--text-muted);">--</span>
+                    </div>
+                    <div class="metric-card" style="margin-bottom: 1rem; border-left: 3px solid var(--info); background: rgba(59, 130, 246, 0.05);">
+                        <div style="display:flex; justify-content:space-between;">
+                            <span class="label">Decision Stability</span>
+                            <span class="value" id="res-stability" style="font-size:1rem;">--</span>
+                        </div>
+                        <div id="res-delta" style="margin-top:0.25rem; font-size:0.75rem; color:var(--text-muted);"></div>
                     </div>
                 </div>
 
@@ -123,10 +131,17 @@
                     </div>
                 </div>
                 
+                <div class="llm-explanation" style="border-left: 3px solid var(--primary); padding-left: 1rem; margin-bottom: 1rem;">
+                    <h3 style="margin-top:0; color:var(--primary);">Decision Composition</h3>
+                    <p id="res-composition" style="margin-top:0; color:var(--text-main); font-size: 0.9rem;"></p>
+                </div>
+                
                 <div class="llm-explanation" style="border-left: 3px solid var(--primary); padding-left: 1rem;">
                     <h3 style="margin-top:0; color:var(--primary);">Decision Justification (Why?)</h3>
                     <p style="font-weight:bold; margin-bottom:0.2rem;">Primary Trigger:</p>
                     <p id="res-trigger" style="margin-top:0; color:var(--text-main);"></p>
+                    <p style="font-weight:bold; margin-bottom:0.2rem; margin-top:0.5rem;">Secondary Contributors:</p>
+                    <ul id="res-secondaries" style="margin-top:0; padding-left:1rem; font-size:0.8rem; color:var(--text-muted);"></ul>
                     <div id="res-conflict" class="conflict-banner hidden"></div>
                 </div>
                 
