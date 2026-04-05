@@ -40,7 +40,9 @@ class FNOLResponse(BaseModel):
     scores: ScoresSchema
     expected_reward: float
     confidence_score: float
-    explanation: Optional[LLMOutput] = None
+    confidence_reason: str
+    primary_trigger: str
+    explanation: Optional[dict] = None
     
     # Redaction parameters securely enforcing serialization
     decision_trace: Optional[List[str]] = None

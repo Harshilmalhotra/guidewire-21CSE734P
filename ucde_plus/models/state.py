@@ -16,6 +16,8 @@ class ClaimContext(BaseModel):
     rl_decision: Optional[str] = None
     expected_reward: Optional[float] = None
     confidence_score: Optional[float] = None
+    confidence_reason: Optional[str] = None
+    primary_trigger: Optional[str] = None
     decision_trace: List[str] = []
     graph_signals: List[str] = []
 

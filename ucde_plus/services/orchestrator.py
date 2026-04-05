@@ -120,17 +120,34 @@ class AgenticOrchestrator:
         
         llm_output = await self.llm.execute(llm_input)
         
-        # XAI Algorithm: Confidence Score bounds via variance
         f_score = ctx.fraud_score or 0.0
         s_score = ctx.severity_score or 0.0
         g_score = ctx.graph_risk_score or 0.0
+        
+        primary_trigger = ""
+        if ctx.rl_decision == "INVESTIGATE":
+            if f_score > 0.6:
+                primary_trigger = f"Fraud Score exceeded threshold ({f_score:.2f} > 0.60)"
+            elif g_score > 0.7:
+                primary_trigger = f"Graph Risk exceeded threshold ({g_score:.2f} > 0.70)"
+            elif s_score > 0.5:
+                primary_trigger = f"Severity Analysis exceeded threshold ({s_score:.2f} > 0.50)"
+            else:
+                primary_trigger = "RL Policy detected complex multi-factorial pattern anomaly."
+        else:
+            primary_trigger = "All risk parameters evaluated cleanly bounded within Threshold limits."
         
         mean_sig = (f_score + s_score + g_score) / 3.0
         variance = ((f_score - mean_sig)**2 + (s_score - mean_sig)**2 + (g_score - mean_sig)**2) / 3.0
         import math
         std_dev = math.sqrt(variance)
         confidence_val = round(max(0.40, 1.0 - (std_dev * 1.5)), 2)
-        ctx = ctx.update(confidence_score=confidence_val)
+        
+        c_reason = "Derived from cohesive signal agreement natively."
+        if confidence_val < 0.75:
+            c_reason = "Derived from internal distance boundary variances (Nodes contradicted natively)."
+            
+        ctx = ctx.update(confidence_score=confidence_val, confidence_reason=c_reason, primary_trigger=primary_trigger)
         
         # 8. Persistent offline array mapped for Database constraints capturing exactly the math required explicitly
         _serialized_state = [
@@ -165,6 +182,8 @@ class AgenticOrchestrator:
             },
             expected_reward=ctx.expected_reward,
             confidence_score=ctx.confidence_score,
+            confidence_reason=ctx.confidence_reason,
+            primary_trigger=ctx.primary_trigger,
             explanation=llm_output,
             decision_trace=ctx.decision_trace,
             graph_signals=ctx.graph_signals

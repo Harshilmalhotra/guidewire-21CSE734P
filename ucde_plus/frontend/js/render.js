@@ -10,6 +10,7 @@ function renderSuccess(data) {
     document.getElementById('res-severity').textContent = data.scores.severity.toFixed(2);
     document.getElementById('res-graph').textContent = data.scores.graph.toFixed(2);
     document.getElementById('res-confidence').textContent = `${(data.confidence_score * 100).toFixed(1)}%`;
+    document.getElementById('res-conf-reason').textContent = data.confidence_reason;
     
     // Reward formatting Semantic
     const rew = data.expected_reward;
@@ -36,13 +37,17 @@ function renderSuccess(data) {
             graphUl.innerHTML += `<li>${key}: +${data.scores.graph_breakdown[key].toFixed(2)}</li>`;
         }
     } else {
-        graphUl.innerHTML = `<li>No Graph Links Detected</li>`;
+        graphUl.innerHTML = `<li>No Graph Links Detected -> Baseline Set</li>`;
     }
+    
+    // Explanation Layer explicitly routing Triggers
+    document.getElementById('res-trigger').textContent = data.primary_trigger || "Execution securely terminated natively.";
     
     // LLM Layer
     document.getElementById('res-justification').textContent = data.explanation?.justification || "No generative evaluation computed securely.";
     
     const conflictEl = document.getElementById('res-conflict');
+    const banner = document.getElementById('res-conflict');
     if(data.explanation?.conflict_explanation) {
         conflictEl.textContent = data.explanation.conflict_explanation;
         conflictEl.classList.remove('hidden');

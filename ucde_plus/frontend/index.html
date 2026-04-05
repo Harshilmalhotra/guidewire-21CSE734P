@@ -103,28 +103,30 @@
 
                 <div class="metrics-grid" style="margin-top: 0;">
                     <div class="metric-card">
-                        <span class="label">Fraud Score</span>
+                        <span class="label">Fraud Score <span style="font-weight:400; font-size:0.7rem; color:var(--text-muted);">(Threshold: 0.60)</span></span>
                         <span class="value" id="res-fraud">0.00</span>
                         <ul id="xai-fraud" style="margin-top:0.5rem; padding-left:1rem; font-size:0.75rem; color:var(--text-muted);"></ul>
                     </div>
                     <div class="metric-card">
-                        <span class="label">Graph Risk</span>
+                        <span class="label">Graph Risk <span style="font-weight:400; font-size:0.7rem; color:var(--text-muted);">(Threshold: 0.70)</span></span>
                         <span class="value" id="res-graph">0.00</span>
                         <ul id="xai-graph" style="margin-top:0.5rem; padding-left:1rem; font-size:0.75rem; color:var(--text-muted);"></ul>
                     </div>
                     <div class="metric-card">
-                        <span class="label">Severity</span>
+                        <span class="label">Severity <span style="font-weight:400; font-size:0.7rem; color:var(--text-muted);">(Threshold: 0.50)</span></span>
                         <span class="value" id="res-severity">0.00</span>
                     </div>
                     <div class="metric-card">
                         <span class="label">System Confidence</span>
                         <span class="value" id="res-confidence">0.00%</span>
+                        <div id="res-conf-reason" style="margin-top:0.25rem; font-size:0.75rem; color:var(--text-muted);"></div>
                     </div>
                 </div>
                 
-                <div class="llm-explanation">
-                    <h3>Semantic Execution</h3>
-                    <p id="res-justification"></p>
+                <div class="llm-explanation" style="border-left: 3px solid var(--primary); padding-left: 1rem;">
+                    <h3 style="margin-top:0; color:var(--primary);">Decision Justification (Why?)</h3>
+                    <p style="font-weight:bold; margin-bottom:0.2rem;">Primary Trigger:</p>
+                    <p id="res-trigger" style="margin-top:0; color:var(--text-main);"></p>
                     <div id="res-conflict" class="conflict-banner hidden"></div>
                 </div>
                 

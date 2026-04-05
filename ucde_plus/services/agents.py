@@ -112,8 +112,8 @@ class GraphAgent:
             graph_risk, graph_signals = await asyncio.wait_for(run_graph(), timeout=0.100)
             status = "success"
         except asyncio.TimeoutError:
-            graph_risk = 0.5
-            graph_signals = ["[GRAPH_AGENT] Timeout: Neutral fallback applied"]
+            graph_risk = 0.0
+            graph_signals = ["[GRAPH_AGENT] Timeout: Safely zeroed contagion bindings explicitly"]
             status = "fallback"
         except Exception:
             graph_risk = 0.0
