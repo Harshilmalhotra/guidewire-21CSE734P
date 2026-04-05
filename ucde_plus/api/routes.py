@@ -1,11 +1,11 @@
 from fastapi import APIRouter
 from models.schemas import FNOLRequest, FNOLResponse
-from services.ingestion import IngestionPipeline
+from services.orchestrator import AgenticOrchestrator
 
 router = APIRouter()
-pipeline = IngestionPipeline()
+orchestrator = AgenticOrchestrator()
 
 @router.post("/fnol", response_model=FNOLResponse)
 async def submit_fnol(request: FNOLRequest):
-    response = pipeline.process_claim(request)
+    response = await orchestrator.process(request)
     return response
