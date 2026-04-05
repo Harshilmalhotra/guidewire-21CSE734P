@@ -15,6 +15,7 @@ class ClaimContext(BaseModel):
     baseline_decision: Optional[str] = None
     rl_decision: Optional[str] = None
     expected_reward: Optional[float] = None
+    confidence_score: Optional[float] = None
     decision_trace: List[str] = []
     graph_signals: List[str] = []
 

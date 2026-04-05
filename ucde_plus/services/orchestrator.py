@@ -120,6 +120,17 @@ class AgenticOrchestrator:
         
         llm_output = await self.llm.execute(llm_input)
         
+        # XAI Algorithm: Confidence Score bounds via variance
+        f_score = ctx.fraud_score or 0.0
+        s_score = ctx.severity_score or 0.0
+        g_score = ctx.graph_risk_score or 0.0
+        
+        mean_sig = (f_score + s_score + g_score) / 3.0
+        variance = ((f_score - mean_sig)**2 + (s_score - mean_sig)**2 + (g_score - mean_sig)**2) / 3.0
+        import math
+        std_dev = math.sqrt(variance)
+        confidence_val = round(max(0.40, 1.0 - (std_dev * 1.5)), 2)
+        ctx = ctx.update(confidence_score=confidence_val)
         
         # 8. Persistent offline array mapped for Database constraints capturing exactly the math required explicitly
         _serialized_state = [
@@ -135,7 +146,8 @@ class AgenticOrchestrator:
             trace_id=ctx.trace_id,
             state_vector=_serialized_state,
             action_str=ctx.rl_decision,
-            version="v1.0.0"
+            version="v1.0.0",
+            baseline_action_str=ctx.baseline_decision
         )
         
         # Formulate isolated generic response explicitly maintaining serialization boundaries
@@ -152,6 +164,7 @@ class AgenticOrchestrator:
                 "graph_breakdown": ctx.graph_breakdown
             },
             expected_reward=ctx.expected_reward,
+            confidence_score=ctx.confidence_score,
             explanation=llm_output,
             decision_trace=ctx.decision_trace,
             graph_signals=ctx.graph_signals

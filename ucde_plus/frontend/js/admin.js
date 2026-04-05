@@ -17,6 +17,7 @@ async function fetchMetrics() {
         let r = (data.recall * 100).toFixed(1);
         let f = (data.f1_score * 100).toFixed(1);
         document.getElementById('m_fraud_rate').textContent = `P: ${p}% | R: ${r}% | F1: ${f}%`;
+        document.getElementById('m_drift_rate').textContent = `${(data.disagreement_drift_rate * 100).toFixed(1)}% (RL Overrides Baseline)`;
         
     } catch(err) {
         console.error("Admin KPI Block Disabled Securing internal structures: ", err);

@@ -8,10 +8,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header class="admin-hud glass">
-        <div class="hud-stat">Total Claims: <span id="m_total_claims">--</span></div>
-        <div class="hud-stat">Agreement Rate: <span id="m_agreements">--</span></div>
-        <div class="hud-stat">Fraud Accuracy: <span id="m_fraud_rate">--</span></div>
+    <header class="admin-hud glass" style="margin-bottom: 2rem;">
+        <div style="display:flex; justify-content:center; gap:2rem; flex-wrap:wrap; width:100%;">
+            <div class="hud-stat">Total Claims: <span id="m_total_claims">--</span></div>
+            <div class="hud-stat">Agreement Rate: <span id="m_agreements">--</span></div>
+            <div class="hud-stat">Fraud Accuracy: <span id="m_fraud_rate">--</span></div>
+            <div class="hud-stat" style="color:var(--danger);">Disagreement Drift: <span id="m_drift_rate" style="color:var(--danger)">--</span></div>
+        </div>
     </header>
 
     <div class="grid-container">
@@ -108,6 +111,10 @@
                     <div class="metric-card">
                         <span class="label">Severity</span>
                         <span class="value" id="res-severity">0.00</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="label">System Confidence</span>
+                        <span class="value" id="res-confidence">0.00%</span>
                     </div>
                 </div>
                 

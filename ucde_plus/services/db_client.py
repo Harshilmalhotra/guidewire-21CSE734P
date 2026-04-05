@@ -38,16 +38,17 @@ class SQLiteClient:
         conn.commit()
         conn.close()
 
-    def insert_prediction(self, trace_id: str, state_vector: list, action_str: str, version: str):
-        # 0 = AUTO_APPROVE, 1 = INVESTIGATE
-        act_int = 0 if action_str == "AUTO_APPROVE" else 1
+    def insert_prediction(self, trace_id: str, state_vector: list, action_str: str, version: str, baseline_action_str: str = "AUTO_APPROVE"):
         conn = sqlite3.connect(self.db_path)
         c = conn.cursor()
         try:
-            c.execute(
-                "INSERT INTO predictions (trace_id, state_vector, predicted_action, model_version, timestamp, status) VALUES (?, ?, ?, ?, ?, ?)",
-                (trace_id, json.dumps(state_vector), act_int, version, datetime.utcnow().isoformat(), "pending")
-            )
+            act_int = 1 if action_str == "INVESTIGATE" else 0
+            base_int = 1 if baseline_action_str == "INVESTIGATE" else 0
+            
+            c.execute('''
+                INSERT INTO predictions (trace_id, state_vector, predicted_action, model_version, timestamp, status, baseline_action)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (trace_id, json.dumps(state_vector), act_int, version, datetime.utcnow().isoformat(), "pending", base_int))
             conn.commit()
         except sqlite3.IntegrityError:
             pass # Idempotent log mapping

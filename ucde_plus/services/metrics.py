@@ -15,9 +15,12 @@ class MetricsComputationLayer:
         
         boundary = self._get_time_boundary(days)
         
-        # Total Claims
-        c.execute("SELECT COUNT(*) FROM predictions WHERE timestamp >= ? AND model_version = ?", (boundary, version))
-        total_claims = c.fetchone()[0]
+        # Total Claims and Baseline Disagreement Tracking
+        c.execute("SELECT predicted_action, baseline_action FROM predictions WHERE timestamp >= ? AND model_version = ?", (boundary, version))
+        prediction_rows = c.fetchall()
+        total_claims = len(prediction_rows)
+        drift_count = sum([1 for r in prediction_rows if r[0] != r[1]])
+        disagreement_rate = (drift_count / total_claims) if total_claims > 0 else 0.0
         
         # Feedback counts mapped
         c.execute('''
@@ -63,6 +66,7 @@ class MetricsComputationLayer:
             "total_claims_processed": total_claims,
             "total_feedback_events": total_feedback,
             "system_agreement_rate": round(sys_agreement_rate, 4),
+            "disagreement_drift_rate": round(disagreement_rate, 4),
             "precision": round(precision, 4),
             "recall": round(recall, 4),
             "f1_score": round(f1, 4),

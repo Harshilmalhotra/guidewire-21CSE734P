@@ -9,6 +9,7 @@ function renderSuccess(data) {
     document.getElementById('res-fraud').textContent = data.scores.fraud.toFixed(2);
     document.getElementById('res-severity').textContent = data.scores.severity.toFixed(2);
     document.getElementById('res-graph').textContent = data.scores.graph.toFixed(2);
+    document.getElementById('res-confidence').textContent = `${(data.confidence_score * 100).toFixed(1)}%`;
     
     // Reward formatting Semantic
     const rew = data.expected_reward;

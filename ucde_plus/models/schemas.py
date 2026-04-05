@@ -39,6 +39,7 @@ class FNOLResponse(BaseModel):
     rl_decision: str
     scores: ScoresSchema
     expected_reward: float
+    confidence_score: float
     explanation: Optional[LLMOutput] = None
     
     # Redaction parameters securely enforcing serialization
