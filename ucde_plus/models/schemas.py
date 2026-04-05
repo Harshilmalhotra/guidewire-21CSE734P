@@ -8,10 +8,14 @@ class FNOLRequest(BaseModel):
     description: str
     images: List[str]
     claimAmount: Optional[float] = None
+    claimHistoryCount: int = 0
+    timeSinceLastClaim: float = 0.0
     metadata: Optional[Dict[str, Any]] = None
 
 class FNOLResponse(BaseModel):
-    decision: str
+    baselineDecision: str
+    rlDecision: str
+    expectedReward: float
     confidence: float
     graphRisk: float
     fraudScore: float

@@ -11,8 +11,10 @@ class IngestionPipeline:
         self.rl_engine = RLEngine()
 
     def process_claim(self, request: FNOLRequest) -> FNOLResponse:
+        # Phase 2 Rules
         fraud_score, severity_score, trace = self.rule_engine.evaluate(request)
         
+        # Phase 3 Graph
         global_graph_service.add_claim_entities(
             claim_id=request.policyId, 
             person_id=request.policyholderId, 
@@ -24,14 +26,26 @@ class IngestionPipeline:
             request.policyId
         )
         
-        # Phase 5: RL Decision Action
-        # Instead of static threshold checks, the RL Policy dictates the final outcome
-        decision = self.rl_engine.predict(severity_score, fraud_score, graph_risk, request.claimAmount)
-        confidence = 0.88 # Stabilized metric representation for RL Policy
+        # Output Baseline A/B evaluation explicitly
+        if fraud_score > 0.5 or severity_score > 0.8 or graph_risk > 0.4:
+            baseline_decision = "INVESTIGATE"
+        else:
+            baseline_decision = "AUTO_APPROVE"
+            
+        # RL Model Prediction over 6-Vector State
+        rl_decision, expected_reward = self.rl_engine.predict(
+            severity_score=severity_score,
+            fraud_score=fraud_score,
+            graph_risk=graph_risk,
+            claim_amount=request.claimAmount,
+            history_count=request.claimHistoryCount,
+            time_since=request.timeSinceLastClaim
+        )
         
-        trace.append(f"RL_POLICY_DECISION: RL Model mathematically optimized policy output to {decision}")
+        trace.append(f"A/B_COMPARISON: Baseline=[{baseline_decision}] | RL=[{rl_decision}]")
         
-        if decision == "INVESTIGATE":
+        # Enforce memory based on RL output
+        if rl_decision == "INVESTIGATE":
             global_graph_service.mark_node_risk(request.policyId, True)
             if fraud_score > 0.5:
                 if request.policyholderId: global_graph_service.mark_node_risk(request.policyholderId, True)
@@ -41,8 +55,10 @@ class IngestionPipeline:
             trace.append("RULE_000_CLEAN: No baseline rules violated.")
             
         return FNOLResponse(
-            decision=decision,
-            confidence=confidence,
+            baselineDecision=baseline_decision,
+            rlDecision=rl_decision,
+            expectedReward=expected_reward,
+            confidence=0.88,
             graphRisk=graph_risk,
             fraudScore=fraud_score,
             decisionTrace=trace,
