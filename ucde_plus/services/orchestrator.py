@@ -108,19 +108,6 @@ class AgenticOrchestrator:
         # 6. Conflict Detector Boundary
         has_conflict = self.conflict.evaluate(ctx.baseline_decision, ctx.rl_decision)
         
-        # 7. LLM Explanation Layer (Read-Only)
-        llm_input = LLMInput(
-            baseline_decision=ctx.baseline_decision,
-            rl_decision=ctx.rl_decision,
-            fraud_score=ctx.fraud_score if ctx.fraud_score is not None else 0.0,
-            severity_score=ctx.severity_score if ctx.severity_score is not None else 0.0,
-            graph_risk_score=ctx.graph_risk_score if ctx.graph_risk_score is not None else 0.5,
-            expected_reward=ctx.expected_reward,
-            conflict_detected=has_conflict
-        )
-        
-        llm_output = await self.llm.execute(llm_input)
-        
         f_score = ctx.fraud_score or 0.0
         s_score = ctx.severity_score or 0.0
         g_score = ctx.graph_risk_score or 0.0
@@ -137,6 +124,7 @@ class AgenticOrchestrator:
         secondaries = []
         stability = "HIGH"
         delta = ""
+        counter = ""
         
         if ctx.rl_decision == "INVESTIGATE":
             counter = f"To APPROVE: Severity < 0.50 AND Fraud < 0.60 AND Graph < 0.70"
@@ -147,9 +135,7 @@ class AgenticOrchestrator:
                 dist = f_score - 0.60
                 if dist < 0.05:
                     stability = "LOW"
-                    delta = f"Δ -{(dist+0.01):.2f} flips decision boundary exactly."
-                else: 
-                    delta = f"Δ -{(dist+0.01):.2f} flips decision boundary exactly."
+                delta = f"Δ -{(dist+0.01):.2f} flips decision boundary exactly."
             elif g_score > 0.7:
                 primary_trigger = f"Graph Risk exceeded threshold ({g_score:.2f} > 0.70)"
                 if f_score >= 0.4: secondaries.append(f"Fraud Score elevated ({f_score:.2f})")
@@ -157,9 +143,7 @@ class AgenticOrchestrator:
                 dist = g_score - 0.70
                 if dist < 0.05:
                     stability = "LOW"
-                    delta = f"Δ -{(dist+0.01):.2f} flips decision boundary exactly."
-                else: 
-                    delta = f"Δ -{(dist+0.01):.2f} flips decision boundary exactly."
+                delta = f"Δ -{(dist+0.01):.2f} flips decision boundary exactly."
             elif s_score > 0.5:
                 primary_trigger = f"Severity Analysis exceeded threshold ({s_score:.2f} > 0.50)"
                 if f_score >= 0.4: secondaries.append(f"Fraud Score elevated ({f_score:.2f})")
@@ -167,9 +151,7 @@ class AgenticOrchestrator:
                 dist = s_score - 0.50
                 if dist < 0.05:
                     stability = "LOW"
-                    delta = f"Δ -{(dist+0.01):.2f} flips decision boundary exactly."
-                else: 
-                    delta = f"Δ -{(dist+0.01):.2f} flips decision boundary exactly."
+                delta = f"Δ -{(dist+0.01):.2f} flips decision boundary exactly."
             else:
                 primary_trigger = "RL Policy detected complex multi-factorial pattern anomaly natively compounding weights."
                 delta = "Compound matrix bound executed."
@@ -181,9 +163,21 @@ class AgenticOrchestrator:
             min_dist = min(f_dist, s_dist)
             if min_dist < 0.10:
                 stability = "LOW"
-                delta = f"Δ +{(min_dist+0.01):.2f} flips decision boundary exactly."
-            else:
-                delta = f"Δ +{(min_dist+0.01):.2f} flips decision boundary exactly."
+            delta = f"Δ +{(min_dist+0.01):.2f} flips decision boundary exactly."
+            
+        # 7. LLM Explanation Layer (Read-Only)
+        llm_input = LLMInput(
+            baseline_decision=ctx.baseline_decision,
+            rl_decision=ctx.rl_decision,
+            fraud_score=f_score,
+            severity_score=s_score,
+            graph_risk_score=g_score,
+            expected_reward=ctx.expected_reward,
+            conflict_detected=has_conflict,
+            primary_trigger=primary_trigger
+        )
+        
+        llm_output = await self.llm.execute(llm_input)
         
         mean_sig = (f_score + s_score + g_score) / 3.0
         variance = ((f_score - mean_sig)**2 + (s_score - mean_sig)**2 + (g_score - mean_sig)**2) / 3.0

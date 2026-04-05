@@ -20,6 +20,7 @@ class LLMInput(BaseModel):
     graph_risk_score: float
     expected_reward: float
     conflict_detected: bool
+    primary_trigger: Optional[str] = None
 
 class LLMOutput(BaseModel):
     justification: str
