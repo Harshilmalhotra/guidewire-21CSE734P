@@ -1,13 +1,17 @@
 function renderSuccess(data) {
+    const stateSuccess = document.getElementById('state-success');
+    stateSuccess.classList.remove('hidden');
+    stateSuccess.style.animation = 'fadeInUp 0.6s ease forwards';
+
     const decisionEl = document.getElementById('res-decision');
-    decisionEl.innerHTML = `<span style="display:block; font-size:0.7rem; color:var(--text-muted);">RL ACTION PIPELINE</span>${data.decision}`;
-    decisionEl.style.color = data.decision === 'INVESTIGATE' ? 'var(--danger)' : 'var(--approve)';
+    decisionEl.innerHTML = `<span style="display:block; font-size:0.6rem; color:var(--text-muted); margin-bottom: 0.5rem;">RL ACTION PIPELINE</span>${data.decision}`;
+    decisionEl.style.borderColor = data.decision === 'INVESTIGATE' ? 'var(--danger)' : 'var(--primary)';
+    decisionEl.style.color = data.decision === 'INVESTIGATE' ? 'var(--danger)' : 'var(--success)';
     
     const baselineEl = document.getElementById('res-baseline');
-    baselineEl.innerHTML = `<span style="display:block; font-size:0.7rem; color:var(--text-muted);">BASELINE RULESET PREDICTION</span>${data.baseline_decision}`;
+    baselineEl.innerHTML = `<span style="display:block; font-size:0.6rem; color:var(--text-muted); margin-bottom: 0.5rem;">BASELINE RULESET</span>${data.baseline_decision}`;
     
     document.getElementById('res-fraud').textContent = data.scores.fraud.toFixed(2);
-    document.getElementById('res-severity').textContent = data.scores.severity.toFixed(2);
     document.getElementById('res-graph').textContent = data.scores.graph.toFixed(2);
     document.getElementById('res-confidence').textContent = `${(data.confidence_score * 100).toFixed(1)}%`;
     document.getElementById('res-conf-reason').textContent = data.confidence_reason;
@@ -16,7 +20,7 @@ function renderSuccess(data) {
     const rew = data.expected_reward;
     let rewText = rew.toFixed(2);
     if(rew < -2.0) rewText += ' (High Risk Penalty)';
-    else if(rew > -1.0) rewText += ' (Clean Action Expectancy)';
+    else if(rew > -1.0) rewText += ' (Optimal Path)';
     document.getElementById('res-reward').textContent = rewText;
     
     // Explicit Feature Breakdowns
@@ -30,71 +34,15 @@ function renderSuccess(data) {
         fraudUl.innerHTML = `<li>Baseline Only</li>`;
     }
     
-    const graphUl = document.getElementById('xai-graph');
-    graphUl.innerHTML = '';
-    if(data.scores.graph_breakdown && Object.keys(data.scores.graph_breakdown).length > 0) {
-        for(let key in data.scores.graph_breakdown) {
-            graphUl.innerHTML += `<li>${key}: +${data.scores.graph_breakdown[key].toFixed(2)}</li>`;
-        }
-    } else {
-        graphUl.innerHTML = `<li>No Graph Links Detected -> Baseline Set</li>`;
-    }
+    // Explanation Layer
+    document.getElementById('res-trigger').textContent = data.primary_trigger || "Execution securely terminated.";
+    document.getElementById('res-justification').textContent = data.explanation?.justification || "No generative evaluation computed.";
     
-    // Stability Layer Map
-    const stabMetric = document.getElementById('res-stability');
-    stabMetric.textContent = data.decision_stability;
-    stabMetric.style.color = (data.decision_stability === "LOW") ? "var(--warning)" : "var(--approve)";
-    document.getElementById('res-delta').textContent = data.sensitivity_delta;
-    
-    // Composition Map
-    const inf = data.influence_distribution;
-    if (inf && Object.keys(inf).length > 0) {
-        document.getElementById('res-composition').textContent = `Severity: ${inf.Severity}% influence | Fraud: ${inf.Fraud}% | Graph: ${inf.Graph}%`;
-    } else {
-        document.getElementById('res-composition').textContent = `Not calculated safely.`;
-    }
-    
-    // Explanation Layer explicitly routing Triggers
-    document.getElementById('res-trigger').textContent = data.primary_trigger || "Execution securely terminated natively.";
-    
-    const secList = document.getElementById('res-secondaries');
-    secList.innerHTML = '';
-    if (data.secondary_contributors && data.secondary_contributors.length > 0) {
-        data.secondary_contributors.forEach(s => {
-            secList.innerHTML += `<li>${s}</li>`;
-        });
-    } else {
-        secList.innerHTML = `<li>No secondary signals passed threshold boundaries securely.</li>`;
-    }
-    
-    // LLM Layer
-    document.getElementById('res-justification').textContent = data.explanation?.justification || "No generative evaluation computed securely.";
-    
-    const conflictEl = document.getElementById('res-conflict');
-    document.getElementById('res-counter').textContent = data.counterfactual || "N/A";
-    if(data.explanation?.conflict_explanation) {
-        conflictEl.textContent = data.explanation.conflict_explanation;
-        conflictEl.classList.remove('hidden');
-    } else {
-        conflictEl.classList.add('hidden');
-    }
-    
-    // Debug Trace mode explicitly appending dynamically formatted blocks safely evaluating innerHTML constraints
-    const traceContainer = document.getElementById('trace-container');
-    const tracesUl = document.getElementById('res-traces');
-    
-    while(tracesUl.firstChild) {
-        tracesUl.removeChild(tracesUl.firstChild);
-    }
-    
-    if(data.decision_trace) {
-        traceContainer.classList.remove('hidden');
-        data.decision_trace.forEach(trace => {
-            const li = document.createElement('li');
-            li.textContent = trace; // Secure insertion preventing XSS
-            tracesUl.appendChild(li);
-        });
-    } else {
-        traceContainer.classList.add('hidden');
+    // Feedback Station
+    const feedbackPanel = document.getElementById('feedback-panel');
+    if (feedbackPanel) {
+        feedbackPanel.classList.remove('hidden');
+        feedbackPanel.dataset.traceId = data.trace_id || "";
+        feedbackPanel.dataset.predictedAction = data.decision;
     }
 }

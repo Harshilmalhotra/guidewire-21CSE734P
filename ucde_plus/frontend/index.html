@@ -3,70 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UCDE++ V1 Telemetry</title>
+    <title>UCDE++ | Decision Telemetry v1</title>
     <link rel="stylesheet" href="index.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header class="admin-hud glass" style="margin-bottom: 2rem;">
-        <div style="display:flex; justify-content:center; gap:2rem; flex-wrap:wrap; width:100%;">
-            <div class="hud-stat">Total Claims: <span id="m_total_claims">--</span></div>
-            <div class="hud-stat">Agreement Rate: <span id="m_agreements">--</span></div>
-            <div class="hud-stat">Fraud Accuracy: <span id="m_fraud_rate">--</span></div>
-            <div class="hud-stat" style="color:var(--danger);">⚠ Drift Alert: RL overrides ↑ <span id="m_drift_rate" style="color:var(--danger)">--</span></div>
-            <div class="hud-stat" style="color:var(--primary);">Trigger Dist: <span id="m_trigger_dist">--</span></div>
+    <div class="bg-blob"></div>
+
+    <header class="admin-hud">
+        <div style="display:flex; align-items:center; gap:3rem; flex-wrap:wrap; width:100%; justify-content: space-between;">
+            <div style="display:flex; align-items:center; gap:1.5rem;">
+                <div class="system-pulse"></div>
+                <h1 style="font-size: 1.2rem; font-weight: 700; border-right: 1px solid var(--glass-border); padding-right: 1.5rem;">UCDE++</h1>
+            </div>
+            
+            <div style="display:flex; gap:2.5rem; flex-wrap:wrap;">
+                <div class="hud-stat">Claims <span id="m_total_claims">--</span></div>
+                <div class="hud-stat">Agreement <span id="m_agreements">--%</span></div>
+                <div class="hud-stat">Accuracy <span id="m_fraud_rate">--%</span></div>
+                <div class="hud-stat" style="color:var(--danger);">Drift RL ↑ <span id="m_drift_rate" style="color:var(--danger)">--</span></div>
+            </div>
+
+            <div id="h-status-tag-container">
+                <span id="h-status-tag" style="background:var(--success-glow); color:var(--success); border: 1px solid var(--success); padding: 4px 12px; border-radius:100px; font-size:0.75rem; font-weight:700; letter-spacing:0.05em;">SYSTEM HEALTHY</span>
+            </div>
         </div>
     </header>
 
     <div class="grid-container">
-        <!-- Input Layer -->
-        <main class="panel form-panel glass">
-            <h2>UCDE++ Intake Gateway</h2>
-            <p>Generate isolated synthetic variables initiating DAG pipeline configurations.</p>
+        <!-- Input Gateway -->
+        <main class="panel">
+            <div style="margin-bottom: 2rem;">
+                <h2>Intake Gateway</h2>
+                <p>Initiating isolated variable synthesis via DAG pipeline configurations.</p>
+            </div>
             
-            <div id="case-replay-container" style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 6px; margin-bottom: 2rem;">
-                <h4 style="margin-top:0; color:var(--text-muted);">Forensic Case Replay & What-If Sandbox</h4>
-                <div style="display:flex; gap:0.5rem; margin-bottom: 1rem;">
+            <div id="case-replay-container" style="background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 16px; border: 1px solid var(--glass-border); margin-bottom: 2.5rem;">
+                <h4 style="margin-top:0; color:var(--text-muted); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 1rem;">Forensic Replay & Sandbox</h4>
+                <div style="display:flex; gap:0.75rem; margin-bottom: 1rem;">
                     <input type="text" id="replay-trace-id" placeholder="Trace ID (e.g. 648e3d99...)" style="flex:1;">
-                    <button id="btn-replay" onclick="fetchReplayTrace()" style="width: auto; padding: 0.5rem 1rem;">Load Memory</button>
+                    <button id="btn-replay" onclick="fetchReplayTrace()" style="width: auto; padding: 0.5rem 1.5rem; font-size: 0.85rem;">Load Memory</button>
                 </div>
-                <div style="display:flex; gap:0.5rem;">
-                    <button onclick="loadWhatIfScenario('amount')" style="background: rgba(59, 130, 246, 0.2); border: 1px solid var(--primary); font-size: 0.8rem; padding: 0.5rem;">What-If: Severity Flip</button>
-                    <button onclick="loadWhatIfScenario('graph')" style="background: rgba(59, 130, 246, 0.2); border: 1px solid var(--primary); font-size: 0.8rem; padding: 0.5rem;">What-If: Contagion Trigger</button>
+                <div style="display:flex; gap:0.75rem;">
+                    <button onclick="loadWhatIfScenario('amount')" style="background: rgba(59, 130, 246, 0.1); border: 1px solid var(--primary); font-size: 0.75rem; padding: 0.5rem;">What-If: Severity Flip</button>
+                    <button onclick="loadWhatIfScenario('graph')" style="background: rgba(59, 130, 246, 0.1); border: 1px solid var(--primary); font-size: 0.75rem; padding: 0.5rem;">What-If: Contagion Trigger</button>
                 </div>
             </div>
 
             <form id="fnol-form">
-                <div class="form-group">
-                    <label for="policyId">Policy ID</label>
-                    <input type="text" id="policyId" name="policyId" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="policyholderId">Policyholder ID</label>
-                    <input type="text" id="policyholderId" name="policyholderId" required>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="policyId">Policy ID</label>
+                        <input type="text" id="policyId" name="policyId" required placeholder="POL-10023">
+                    </div>
+                    <div class="form-group">
+                        <label for="policyholderId">Policyholder ID</label>
+                        <input type="text" id="policyholderId" name="policyholderId" required placeholder="PH-5592">
+                    </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="vehicleVin">Vehicle VIN</label>
-                    <input type="text" id="vehicleVin" name="vehicleVin" required>
+                    <input type="text" id="vehicleVin" name="vehicleVin" required placeholder="1HGCM8263... ">
                 </div>
                 
                 <div class="form-group">
                     <label for="claimAmount">Claim Amount ($)</label>
-                    <input type="number" id="claimAmount" name="claimAmount" min="1" required>
+                    <input type="number" id="claimAmount" name="claimAmount" min="1" required placeholder="5000">
                 </div>
                 
                 <div class="form-group">
                     <label for="description">Incident Description</label>
-                    <textarea id="description" name="description" rows="3" required></textarea>
+                    <textarea id="description" name="description" rows="3" required placeholder="Describe the incident bounds..."></textarea>
                 </div>
 
-                <div class="form-group mode-toggle">
-                    <label>
-                        <input type="checkbox" id="debugMode" name="debugMode">
-                        Enable Debug Trace
-                    </label>
+                <div class="form-group mode-toggle" style="display: flex; align-items: center; gap: 0.75rem;">
+                    <input type="checkbox" id="debugMode" name="debugMode" style="width: auto;">
+                    <label for="debugMode" style="margin-bottom: 0;">Enable Deep Architecture Trace</label>
                 </div>
                 
                 <button type="submit" id="submit-btn" aria-label="Submit Claim for Evaluation">Evaluate Architecture</button>
@@ -74,146 +86,159 @@
             </form>
         </main>
         
-        <!-- Render Layer -->
-        <aside class="panel result-panel glass" aria-live="polite">
-            <h2>Verdict Telemetry</h2>
+        <!-- Results Interface -->
+        <aside class="panel" aria-live="polite">
+            <div style="margin-bottom: 2rem;">
+                <h2>Verdict Telemetry</h2>
+                <p>Real-time RL policy execution and XAI justifications.</p>
+            </div>
             
             <div id="state-idle" class="ui-state">Awaiting asynchronous transmission loops...</div>
             
             <div id="state-loading" class="ui-state hidden">
-                <div class="skeleton-shimmer">Analyzing Context Bounds...</div>
                 <div class="skeleton-block"></div>
-                <div class="skeleton-block delay"></div>
+                <div class="skeleton-block" style="animation-delay: 0.2s;"></div>
             </div>
             
-            <div id="state-success" class="ui-state hidden">
-                <div class="decision-layout" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                    <div class="decision-badge" id="res-baseline" style="flex:1; background: rgba(255,255,255,0.05); font-size: 0.9rem;">
-                        <span style="display:block; font-size:0.7rem; color:var(--text-muted);">BASELINE RULESET API</span>
+            <div id="state-success" class="ui-state hidden" style="text-align: left; padding: 0;">
+                <div class="decision-layout" style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                    <div class="decision-badge" id="res-baseline" style="flex:1; background: rgba(255,255,255,0.02); font-size: 0.8rem; letter-spacing: 1px;">
+                        <span style="display:block; font-size:0.6rem; color:var(--text-muted); margin-bottom: 0.5rem;">BASELINE RULESET</span>
                         --
                     </div>
-                    <div class="decision-badge" id="res-decision" style="flex:1;">--</div>
+                    <div class="decision-badge" id="res-decision" style="flex:1; border-color: var(--primary);">
+                        <span style="display:block; font-size:0.6rem; color:var(--text-muted); margin-bottom: 0.5rem;">RL ACTION PIPELINE</span>
+                        --
+                    </div>
                 </div>
                 
-                <div class="metrics-grid" style="grid-template-columns: 1fr;">
-                    <div class="metric-card" style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                        <span class="label">Expected Reward Range</span>
-                        <span class="value" id="res-reward" style="font-size: 1.2rem; color:var(--text-muted);">--</span>
-                    </div>
-                    <div class="metric-card" style="margin-bottom: 1rem; border-left: 3px solid var(--info); background: rgba(59, 130, 246, 0.05);">
-                        <div style="display:flex; justify-content:space-between;">
-                            <span class="label">Decision Stability</span>
-                            <span class="value" id="res-stability" style="font-size:1rem;">--</span>
-                        </div>
-                        <div id="res-delta" style="margin-top:0.25rem; font-size:0.75rem; color:var(--text-muted);"></div>
-                    </div>
+                <div class="metric-card" style="margin-bottom: 1.5rem;">
+                    <span class="label">Expected Reward Range</span>
+                    <span class="value" id="res-reward" style="color:var(--primary);">--</span>
                 </div>
 
-                <div class="metrics-grid" style="margin-top: 0;">
+                <div class="metrics-grid">
                     <div class="metric-card">
-                        <span class="label">Fraud Score <span style="font-weight:400; font-size:0.7rem; color:var(--text-muted);">(Threshold: 0.60)</span></span>
+                        <span class="label">Fraud Score</span>
                         <span class="value" id="res-fraud">0.00</span>
-                        <ul id="xai-fraud" style="margin-top:0.5rem; padding-left:1rem; font-size:0.75rem; color:var(--text-muted);"></ul>
-                    </div>
-                    <div class="metric-card">
-                        <span class="label">Graph Risk <span style="font-weight:400; font-size:0.7rem; color:var(--text-muted);">(Threshold: 0.70)</span></span>
-                        <span class="value" id="res-graph">0.00</span>
-                        <ul id="xai-graph" style="margin-top:0.5rem; padding-left:1rem; font-size:0.75rem; color:var(--text-muted);"></ul>
-                    </div>
-                    <div class="metric-card">
-                        <span class="label">Severity <span style="font-weight:400; font-size:0.7rem; color:var(--text-muted);">(Threshold: 0.50)</span></span>
-                        <span class="value" id="res-severity">0.00</span>
+                        <ul id="xai-fraud" style="margin-top:1rem; padding-left:1rem; font-size:0.75rem; color:var(--text-muted); list-style: square;"></ul>
                     </div>
                     <div class="metric-card">
                         <span class="label">System Confidence</span>
                         <span class="value" id="res-confidence">0.00%</span>
-                        <div id="res-conf-reason" style="margin-top:0.25rem; font-size:0.75rem; color:var(--text-muted);"></div>
+                        <div id="res-conf-reason" style="margin-top:0.75rem; font-size:0.75rem; color:var(--text-muted);"></div>
                     </div>
                 </div>
                 
-                <div class="llm-explanation" style="border-left: 3px solid var(--primary); padding-left: 1rem; margin-bottom: 1rem;">
-                    <h3 style="margin-top:0; color:var(--primary);">Decision Composition</h3>
-                    <p id="res-composition" style="margin-top:0; color:var(--text-main); font-size: 0.9rem;"></p>
-                </div>
-                
-                <div class="llm-explanation" style="border-left: 3px solid var(--primary); padding-left: 1rem;">
-                    <h3 style="margin-top:0; color:var(--primary);">Decision Justification (Why?)</h3>
-                    <p id="res-justification" style="margin-bottom:1rem; color:var(--text-main); font-style: italic;"></p>
+                <div class="llm-explanation">
+                    <h3>Decision Justification</h3>
+                    <div id="res-justification" style="margin-bottom:1.5rem; color:var(--text-main); font-style: italic; font-weight: 300; font-size: 1.1rem; line-height: 1.4;"></div>
                     
-                    <p style="font-weight:bold; margin-bottom:0.2rem;">Primary Trigger:</p>
-                    <p id="res-trigger" style="margin-top:0; color:var(--text-main);"></p>
-                    <p style="font-weight:bold; margin-bottom:0.2rem; margin-top:0.5rem;">Secondary Contributors:</p>
-                    <ul id="res-secondaries" style="margin-top:0; padding-left:1rem; font-size:0.8rem; color:var(--text-muted);"></ul>
-                    <p style="font-weight:bold; margin-bottom:0.2rem; margin-top:0.5rem;">Counterfactual Boundary:</p>
-                    <p id="res-counter" style="margin-top:0; color:var(--text-main);"></p>
-                    <div id="res-conflict" class="conflict-banner hidden"></div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; border-top: 1px solid var(--glass-border); padding-top: 1.5rem; margin-top: 1.5rem;">
+                        <div>
+                            <p style="font-weight:700; font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem;">Primary Trigger</p>
+                            <p id="res-trigger" style="color:var(--text-main); font-size: 0.9rem;"></p>
+                        </div>
+                        <div>
+                            <p style="font-weight:700; font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem;">Graph Risk</p>
+                            <p id="res-graph" style="color:var(--text-main); font-size: 1.1rem; font-weight: 700;"></p>
+                        </div>
+                    </div>
                 </div>
                 
-                
-                <div id="trace-container" class="debug-traces hidden">
-                    <h3>DAG Internal Matrix Traces</h3>
-                    <ul id="res-traces"></ul>
-                </div>
-
-                <!-- Feedback Layer -->
                 <div id="feedback-panel" class="feedback-panel hidden" data-trace-id="" data-predicted-action="">
-                    <h3>Adjuster Override Station</h3>
-                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Resolves decisions natively bounding Offline Batch Training configurations.</p>
+                    <h3 style="margin-bottom: 0.5rem;">Adjuster Station</h3>
+                    <p style="margin-bottom: 1.5rem;">Confirm or override the autonomous verdict.</p>
                     <div class="feedback-actions">
                         <button class="btn-approve" onclick="submitAdjusterOverrides('AUTO_APPROVE', false)">Verify Authentic</button>
                         <button class="btn-danger" onclick="submitAdjusterOverrides('INVESTIGATE', true)">Flag as Fraud</button>
                     </div>
                 </div>
-            </section>
-
-            <!-- 10/10 Enterprise MLOps Training Dashboard -->
-            <section class="card" style="margin-top: 1rem; border-top: 4px solid var(--primary);">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                    <h2 style="margin:0;">System Training & Health</h2>
-                    <span id="h-status-tag" class="hud-stat" style="background:var(--success); color:white; padding: 2px 8px; border-radius:4px; font-size:0.7rem;">HEALTHY</span>
-                </div>
-                
-                <div class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:0.5rem;">
-                    <div class="metric-card" style="background:rgba(255,255,255,0.05);">
-                         <span class="label">LLM Mode</span>
-                         <span class="value" id="h-llm" style="font-size:0.9rem; color:var(--info);">--</span>
-                    </div>
-                    <div class="metric-card" style="background:rgba(255,255,255,0.05);">
-                         <span class="label">Active Model</span>
-                         <span class="value" id="h-model" style="font-size:0.9rem;">--</span>
-                    </div>
-                    <div class="metric-card" style="background:rgba(255,255,255,0.05);">
-                         <span class="label">Samples (n)</span>
-                         <span class="value" id="h-samples" style="font-size:0.9rem;">--</span>
-                    </div>
-                    <div class="metric-card" style="background:rgba(255,255,255,0.05);">
-                         <span class="label">Training Readiness</span>
-                         <span class="value" id="h-readiness" style="font-size:0.9rem; color:var(--text-muted);">--</span>
-                    </div>
-                </div>
-
-                <div id="training-progress-container" class="hidden" style="margin-top:1rem; background:rgba(255,255,255,0.05); padding:1rem; border-radius:8px;">
-                     <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
-                         <span style="font-size:0.8rem; font-weight:bold;">Retraining in Progress...</span>
-                         <span id="h-training-status" style="font-size:0.8rem; font-weight:bold; color:var(--info);">RUNNING</span>
-                     </div>
-                     <div style="height:4px; width:100%; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden;">
-                         <div id="h-progress-bar" style="height:100%; width:30%; background:var(--info); transition: width 0.3s ease;"></div>
-                     </div>
-                </div>
-
-                <button id="btn-retrain" class="primary-btn" style="width:100%; margin-top:1rem; opacity:0.5; cursor:not-allowed;" disabled>
-                    Retrain RL Policy Natively
-                </button>
-            </section>
+            </div>
         </aside>
     </div>
 
+    <section class="panel" style="margin-top: 2rem; max-width: 1400px; margin-left: auto; margin-right: auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+             <h2>System Training & Health</h2>
+             <div id="h-status-tag-header"></div>
+        </div>
+        
+        <div class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+            <div class="metric-card">
+                 <span class="label">LLM Mode</span>
+                 <span class="value" id="h-llm" style="font-size:1.2rem; color:var(--primary);">--</span>
+            </div>
+            <div class="metric-card">
+                 <span class="label">Active Model</span>
+                 <span class="value" id="h-model" style="font-size:1.2rem;">--</span>
+            </div>
+            <div class="metric-card">
+                 <span class="label">Samples (n)</span>
+                 <span class="value" id="h-samples" style="font-size:1.2rem;">--</span>
+            </div>
+            <div class="metric-card">
+                 <span class="label">Training Readiness</span>
+                 <span class="value" id="h-readiness" style="font-size:1.2rem; color:var(--text-muted);">--</span>
+            </div>
+        </div>
+
+        <div id="training-progress-container" class="hidden" style="margin-top:2rem; background:rgba(255,255,255,0.02); padding:1.5rem; border-radius:16px;">
+             <div style="display:flex; justify-content:space-between; margin-bottom:1rem;">
+                 <span style="font-size:0.9rem; font-weight:700;">Retraining in Progress...</span>
+                 <span id="h-training-status" style="font-size:0.9rem; font-weight:700; color:var(--primary);">RUNNING</span>
+             </div>
+             <div style="height:6px; width:100%; background:rgba(255,255,255,0.05); border-radius:10px; overflow:hidden;">
+                 <div id="h-progress-bar" style="height:100%; width:0%; background:var(--primary); box-shadow: 0 0 15px var(--primary-glow); transition: width 0.3s ease;"></div>
+             </div>
+        </div>
+
+        <button id="btn-retrain" style="width:100%; margin-top:2rem; opacity:0.5; cursor:not-allowed;" disabled>
+            Retrain RL Policy Natively
+        </button>
+    </section>
+
+    <!-- Background Decoration Scripts -->
+    <style>
+        .system-pulse {
+            width: 12px; height: 12px;
+            background: var(--success);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 0 10px var(--success-glow);
+        }
+        .system-pulse::after {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            border: 1px solid var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        .bg-blob {
+            position: fixed;
+            top: 20%; left: -10%;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+            z-index: -2;
+            filter: blur(80px);
+            animation: float 20s infinite alternate;
+        }
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100px, 50px); }
+        }
+    </style>
+
     <!-- Modularity Mapping -->
-    <script src="js/state.js?v=2"></script>
-    <script src="js/api.js?v=2"></script>
-    <script src="js/render.js?v=2"></script>
-    <script src="js/main.js?v=2"></script>
-    <script src="js/admin.js?v=2"></script>
+    <script src="js/state.js?v=3"></script>
+    <script src="js/api.js?v=3"></script>
+    <script src="js/render.js?v=3"></script>
+    <script src="js/main.js?v=3"></script>
+    <script src="js/admin.js?v=3"></script>
 </body>
 </html>
